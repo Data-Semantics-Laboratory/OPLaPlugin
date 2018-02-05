@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1517853381526
+Build-Jdk: 1.8.0_162
+Built-By: hirtq
+Bundle-ClassPath: .
+Bundle-Description: A dummy plugin to jump-start developers
+Bundle-ManifestVersion: 2
+Bundle-Name: Dummy plugin
+Bundle-SymbolicName: org.protege.plugin.template;singleton:=true
+Bundle-Vendor: The Protege Development Team
+Bundle-Version: 0.1.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: template;uses:="org.protege.editor.owl.model,org.semanti
+ cweb.owlapi.model,org.protege.editor.owl.ui.action,org.protege.editor.o
+ wl.model.selection,org.apache.log4j,javax.swing,org.protege.editor.owl.
+ ui.view";version="0.1.0.SNAPSHOT"
+Import-Package: javax.swing,org.apache.log4j;version="[1.2,2)",org.prote
+ ge.editor.owl.model;version="4.3",org.protege.editor.owl.model.selectio
+ n;version="4.3",org.protege.editor.owl.ui.action;version="4.3",org.prot
+ ege.editor.owl.ui.view;version="4.3",org.semanticweb.owlapi.model
+Tool: Bnd-1.50.0
