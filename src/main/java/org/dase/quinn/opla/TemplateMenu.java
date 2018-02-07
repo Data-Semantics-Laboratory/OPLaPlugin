@@ -51,12 +51,4 @@ public class TemplateMenu extends ProtegeOWLAction
 		JFrame parent = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, workspace);
 		JOptionPane.showMessageDialog(parent, message);
 	}
-
-	/**
-	 * Temporary Main
-	 */
-	public static void main(String[] args)
-	{
-		
-	}
 }
