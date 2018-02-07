@@ -3,49 +3,49 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<!--this is comment -->
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
 
-	<groupId>org.daselab</groupId>
-	<artifactId>quinn.opla</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
-	<name>Opla Plugin</name>
-	<description>Plugin designed to help annotate ontologies with the meta-ontology Opla language.</description>
+	<groupId>edu.wright.dase</groupId>
+	<artifactId>OWLAx</artifactId>
+	<version>1.1.0</version>
+	<name>OWLAx Protege 5.0+ Plugin</name>
+	<description>Ontology Design Pattern Plugin for Desktop Protege 5.0+</description>
+	<packaging>bundle</packaging>
 
 	<developers>
 		<developer>
-			<name>Quinn Hirt</name>
-			<email>Hirt.14@wright.edu</email>
-		</developer>
-		<developer>
-			<name>Cogan Shimizu</name>
-			<email>Shimizu.5@wright.edu</email>
+			<name>Md Kamruzzaman Sarker</name>
+			<email>mdkamruzzamansarker@gmail.com</email>
 		</developer>
 	</developers>
-
-	<packaging>bundle</packaging>
-
+	
+	<scm>
+		<connection>scm:git:git@github.com:md-k-sarker/OWLAx.git</connection>
+		<developerConnection>scm:git:git@github.com:md-k-sarker/OWLAx.git</developerConnection>
+		<url>https://github.com/md-k-sarker/OWLAx</url>
+	  <tag>HEAD</tag>
+	</scm>
+	
+	
 	<dependencies>
-		<dependency>
-			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.common</artifactId>
-			<version>4.3.0</version>
-		</dependency>
 
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.core.application</artifactId>
-			<version>4.3.0</version>
+			<artifactId>protege-editor-owl</artifactId>
+			<version>[5.0.0]</version>
 		</dependency>
 
-		<dependency>
-			<groupId>edu.stanford.protege</groupId>
-			<artifactId>org.protege.editor.owl</artifactId>
-			<version>4.3.0</version>
-		</dependency>
+		<!-- <dependency> <groupId>org.checkerframework</groupId> <artifactId>checker</artifactId> 
+			<version>2.0.0</version> </dependency> <dependency> <groupId>org.checkerframework</groupId> 
+			<artifactId>checker-qual</artifactId> <version>2.0.0</version> </dependency> 
+			<dependency> <groupId>org.checkerframework</groupId> <artifactId>jdk8</artifactId> 
+			<version>2.0.0</version> </dependency> -->
+
 	</dependencies>
 
 	<build>
@@ -53,31 +53,37 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.7</version>
 				<extensions>true</extensions>
 				<configuration>
+
 					<instructions>
-						<Bundle-ClassPath>.</Bundle-ClassPath>
+						<Bundle-Activator>org.protege.editor.owl.ProtegeOWL</Bundle-Activator>
 						<Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
-						<Bundle-Vendor>The Protege Development Team</Bundle-Vendor>
+						<Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
+						<Bundle-ClassPath>.</Bundle-ClassPath>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Dependency>
+						</Embed-Dependency>
 						<Import-Package>
-							org.apache.log4j.*;version="[1.2,2)",
-							org.protege.editor.core.*;version="4.3",
-							org.protege.editor.owl.*;version="4.3",
+							org.protege.editor.core.*;version="5.0.0",
+							org.protege.editor.owl.*;version="5.0.0",
+							org.semanticweb.owlapi.*;version="[4.2.5,5.0.0)",
+							com.ibm.icu.*;resolution:=optional,
+							org.eclipse.swt.*;resolution:=optional,
+							org.eclipse.jface.*;resolution:=optional,
 							*
 						</Import-Package>
-						<Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
-						<Private-Package>skeleton</Private-Package>
 					</instructions>
+
 					<executions>
 						<execution>
 							<id>bundle-manifest</id>
@@ -87,13 +93,7 @@
 							</goals>
 						</execution>
 					</executions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<pde>true</pde>
+
 				</configuration>
 			</plugin>
 		</plugins>

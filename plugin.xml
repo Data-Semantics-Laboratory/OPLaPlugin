@@ -1,32 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?>
 
 <plugin>
-      <extension id="OPLaView"
-        point="org.protege.editor.core.application.WorkspaceTab">
-        <label value="OPLaTab" />
-        <class value="org.dase.quinn.opla.OplaUITab" />
-        <index value="X" />
-        <editorKitId value="OWLEditorKit" />
-      </extension>
 
-      <!-- 
-       <extension id="example.menu"
-               point="org.protege.editor.core.application.EditorKitMenuAction">
-        <name value="Example..."/>
-        <class value="template.TemplateMenu"/>
-        <toolTip value="A menu plugin to bootstrap the new plugin process"/>
-        <path value="org.protege.editor.owl.menu.tools/SlotZ-Z"/>
-        <editorKitId value="OWLEditorKit"/>
-       </extension>
+	<extension id="SWRLTab" point="org.protege.editor.core.application.WorkspaceTab">
+		<label value="OWLAx"/>
+		<class value="edu.wright.dase.OdpMainUITab"/>
+		<index value="X"/>
+		<editorKitId value="OWLEditorKit"/>
+  </extension>  
 
-        <extension id="example.view"
-               point="org.protege.editor.core.application.ViewComponent">
-        <label value="Example"/>
-        <class value="template.TemplateView"/>
-        <headerColor value="@org.protege.ontologycolor"/>
-        <category value="@org.protege.ontologycategory"/>
-         </extension>
-      -->
-    
 </plugin>
