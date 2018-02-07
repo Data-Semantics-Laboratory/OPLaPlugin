@@ -1,4 +1,4 @@
-package org.daselab.quinn.opla;
+package org.dase.quinn.opla;
 
 import java.awt.BorderLayout;
 
@@ -21,6 +21,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
  * @author redmond
  *
  */
+
 public class TemplateView extends AbstractOWLViewComponent
 {
 	private static final long			serialVersionUID	= 1505057428784911280L;

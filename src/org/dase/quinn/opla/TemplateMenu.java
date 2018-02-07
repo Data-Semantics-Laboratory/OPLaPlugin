@@ -1,4 +1,4 @@
-package org.daselab.quinn.opla;
+package org.dase.quinn.opla;
 
 import java.awt.event.ActionEvent;
 
@@ -52,4 +52,11 @@ public class TemplateMenu extends ProtegeOWLAction
 		JOptionPane.showMessageDialog(parent, message);
 	}
 
+	/**
+	 * Temporary Main
+	 */
+	public static void main(String[] args)
+	{
+		
+	}
 }
