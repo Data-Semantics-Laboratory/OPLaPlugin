@@ -1,4 +1,4 @@
-package template;
+package org.daselab.quinn.opla;
 
 import java.awt.event.ActionEvent;
 
