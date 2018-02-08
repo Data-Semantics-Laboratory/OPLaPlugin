@@ -2,10 +2,6 @@ package edu.wright.dase;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
@@ -16,45 +12,79 @@ import org.protege.editor.owl.ui.OWLWorkspaceViewsTab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+public class OdpMainUITab extends OWLWorkspaceViewsTab
+{
+	/** book keeping (literally) */
+	private static final long		serialVersionUID	= 1L;
+	private static final Logger		log					= LoggerFactory.getLogger(OdpMainUITab.class);
 
-public class OdpMainUITab extends OWLWorkspaceViewsTab {
+	/** For use in detecting changes in the underlying ontology */
+	private final OplaTabListener	oplaTabListener		= new OplaTabListener();
 
-	private static final long serialVersionUID = 1L;
-	private OWLModelManager protegeOWLModelManager;
-	private static final Logger log = LoggerFactory.getLogger(OdpMainUITab.class);
-	OWLEditorKit owlEditorKit;
-
-	OWLEntityFinder owlEntityFinder;
-	private final ODPTabListener listener = new ODPTabListener();
+	private OWLModelManager			modelManager;
+	/** Not sure what these are for, yet */
+	private OWLEditorKit			owlEditorKit;
+	private OWLEntityFinder			owlEntityFinder;
 
 	@Override
-	public void initialise() {
-
+	public void initialise()
+	{
+		// Set up
 		super.initialise();
-
 		setToolTipText("OplaAnnotate");
 
-		log.warn("OWLAx initialization failed - no model manager");
+		this.modelManager = getOWLModelManager();
+		
+		// Ensure that there is a model manager before continuing.
+		if(this.modelManager != null)
+		{
+			// Continue set up
+			this.modelManager.addListener(this.oplaTabListener);
 
+			// Construct and populate the layout
+			setLayout(new BorderLayout());
+			/* TODO: do more here
+			add(new EditorMenuBar(editor), BorderLayout.NORTH);
+
+			add(editor, BorderLayout.CENTER);
+
+			JFrame mainWindow = (javax.swing.JFrame) SwingUtilities.windowForComponent(this);
+			editor.setProtegeMainWindow(mainWindow);
+			 */
+			
+			
+			// If there is an active ontology
+			if(this.modelManager.getActiveOntology() != null)
+			{
+				update();
+			}
+		}
+		else // output warning to log, do not initialize further
+		{
+			log.warn("SWRLTab initialization failed - no model manager");
+		}
 	}
 
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		//super.dispose();
-		getOWLModelManager().removeListener(this.listener);
+	public void dispose()
+	{
+		super.dispose();
+		getOWLModelManager().removeListener(this.oplaTabListener);
 	}
 
-	private void update() {
-
+	private void update()
+	{
+		// Update the view
 	}
 
-	private class ODPTabListener implements OWLModelManagerListener {
+	private class OplaTabListener implements OWLModelManagerListener
+	{
 		@Override
-		public void handleChange(OWLModelManagerChangeEvent event) {
-
-			if (event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED) {
-
+		public void handleChange(OWLModelManagerChangeEvent event)
+		{
+			// If the underlying ontology has changed, change the view.
+			if(event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED)
+			{
 				update();
 			}
 		}
