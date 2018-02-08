@@ -16,7 +16,6 @@ import org.protege.editor.owl.ui.OWLWorkspaceViewsTab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.wright.dase.swing.editor.EditorMenuBar;
 
 public class OdpMainUITab extends OWLWorkspaceViewsTab {
 
@@ -24,7 +23,7 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab {
 	private OWLModelManager protegeOWLModelManager;
 	private static final Logger log = LoggerFactory.getLogger(OdpMainUITab.class);
 	OWLEditorKit owlEditorKit;
-	GraphEditor editor;
+
 	OWLEntityFinder owlEntityFinder;
 	private final ODPTabListener listener = new ODPTabListener();
 
@@ -33,30 +32,9 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab {
 
 		super.initialise();
 
-		setToolTipText("OWLAx");
+		setToolTipText("OplaAnnotate");
 
-		if (getOWLModelManager() != null) {
-
-			// first set protege informations
-			this.protegeOWLModelManager = getOWLModelManager();
-			this.protegeOWLModelManager.addListener(listener);
-
-			this.owlEditorKit = getOWLEditorKit();
-
-			setLayout(new BorderLayout());
-
-			editor = new GraphEditor(this.protegeOWLModelManager);
-
-			add(new EditorMenuBar(editor), BorderLayout.NORTH);
-
-			add(editor, BorderLayout.CENTER);
-
-			JFrame mainWindow = (javax.swing.JFrame) SwingUtilities.windowForComponent(this);
-			editor.setProtegeMainWindow(mainWindow);
-
-			update();
-		} else
-			log.warn("OWLAx initialization failed - no model manager");
+		log.warn("OWLAx initialization failed - no model manager");
 
 	}
 
@@ -68,21 +46,6 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab {
 	}
 
 	private void update() {
-
-		this.protegeOWLModelManager = getOWLModelManager();
-		this.owlEditorKit = getOWLEditorKit();
-		this.owlEntityFinder = this.protegeOWLModelManager.getOWLEntityFinder();
-
-		if (this.protegeOWLModelManager != null) {
-			editor.setProtegeOWLModelManager(this.protegeOWLModelManager);
-		}
-		if (this.owlEditorKit != null) {
-			editor.setProtegeOWLEditorKit(this.owlEditorKit);
-		}
-		if (this.owlEntityFinder != null) {
-			editor.setProtegeEntityFinder(this.owlEntityFinder);
-
-		}
 
 	}
 
