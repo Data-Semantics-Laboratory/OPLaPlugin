@@ -68,7 +68,7 @@ public class OplaUI extends JPanel
 		buttons.add(classAx);
 
 		// Create the panel for options
-		JPanel entityPanel = new JPanel(new FlowLayout());
+		entityPanel.setLayout(new FlowLayout());
 		entityPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		// Add the buttons to the panel
@@ -129,13 +129,13 @@ public class OplaUI extends JPanel
 		// TODO: add actionlistener for saving the annotation
 		
 		// Create the "editor" panel
-		JPanel f2 = new JPanel(new FlowLayout());
-		f2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		editorPanel.setLayout(new FlowLayout());
+		editorPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		// Add everythin
-		f2.add(scrollPane);
-		f2.add(comboAnnotations);
-		f2.add(targetTextField);
-		f2.add(saveButton);
+		editorPanel.add(scrollPane);
+		editorPanel.add(comboAnnotations);
+		editorPanel.add(targetTextField);
+		editorPanel.add(saveButton);
 	}
 }
