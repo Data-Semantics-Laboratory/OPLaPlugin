@@ -43,10 +43,14 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 
 			// Construct and populate the layout
 			setLayout(new BorderLayout());
+			
+			OplaUI oplaUI = new OplaUI();
+			add(oplaUI, BorderLayout.CENTER);
+			
 			/* TODO: do more here
 			add(new EditorMenuBar(editor), BorderLayout.NORTH);
 
-			add(editor, BorderLayout.CENTER);
+			
 
 			JFrame mainWindow = (javax.swing.JFrame) SwingUtilities.windowForComponent(this);
 			editor.setProtegeMainWindow(mainWindow);
