@@ -21,66 +21,66 @@ import javax.swing.JTextField;
 
 public class OplaUI extends JPanel
 {
+	/** Bookkeeping */
+	private static final long	serialVersionUID	= 1L;
 
-	/** Bookkeeping  */
-	private static final long serialVersionUID = 1L;
+	/** Panels! */
+	private JPanel				entityPanel;
+	private JPanel				editorPanel;
+
+	/** The Controller */
+	private OplaController oplaController;
 	
-	private FlowLayout			buttonLayout		= new FlowLayout();
-	private JRadioButton		classes				= new JRadioButton("Classes");
-	private JRadioButton		individuals			= new JRadioButton("Individuals");
-	private JRadioButton		objProp				= new JRadioButton("Object Properties");
-	private JRadioButton		dataProp			= new JRadioButton("Data Properties");
-	private JRadioButton		dataType			= new JRadioButton("Data Types");
-	private JRadioButton		annot				= new JRadioButton("Annotations");
-	private JRadioButton		classAx				= new JRadioButton("Class Axioms");
-	private JComboBox<String>	comboAnnotations	= new JComboBox<String>();
-	private ButtonGroup			buttons				= new ButtonGroup();
-	private JTextField			textField			= new JTextField();
-	private JButton				save				= new JButton("Save");
-
-	public OplaUI()
+	public OplaUI(OplaController oplaController)
 	{
-		// TODO: create methods for creating these outside of the constructor
+		this.oplaController = oplaController;
 		
-		// Create the panel for options
-		JPanel f1 = new JPanel(new FlowLayout());
-		f1.add(classes);
+		// Populate the panels
+		createEntityPanel();
+		createEditorPanel();
+
+		// Construct top level panel
+		setLayout(new BorderLayout());
+		this.add(this.entityPanel, BorderLayout.NORTH);
+		this.add(this.editorPanel, BorderLayout.CENTER);
+	}
+
+	private void createEntityPanel()
+	{
+		// Create the buttons
+		JRadioButton classes = new JRadioButton("Classes");
+		JRadioButton individuals = new JRadioButton("Individuals");
+		JRadioButton objProp = new JRadioButton("Object Properties");
+		JRadioButton dataProp = new JRadioButton("Data Properties");
+		JRadioButton dataType = new JRadioButton("Data Types");
+		JRadioButton annot = new JRadioButton("Annotations");
+		JRadioButton classAx = new JRadioButton("Class Axioms");
+
+		// TODO: set default selection
+		// Add the buttons to a buttongroup
+		ButtonGroup buttons = new ButtonGroup();
 		buttons.add(classes);
-		f1.add(individuals);
 		buttons.add(individuals);
-		f1.add(objProp);
 		buttons.add(objProp);
-		f1.add(dataProp);
 		buttons.add(dataProp);
-		f1.add(dataType);
 		buttons.add(dataType);
-		f1.add(annot);
 		buttons.add(annot);
-		f1.add(classAx);
 		buttons.add(classAx);
-		f1.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
-		// Create the "editor" panel
-		JPanel f2 = new JPanel(new FlowLayout());
-		
-		// TODO: remove hardcoded list data
-		String[] data = { "one", "two", "three", "four" };
-		JList<String> myList = new JList<String>(data);
-		JScrollPane scrollPane = new JScrollPane(myList);
-		scrollPane.setPreferredSize(new Dimension(100, 100));
-		f2.add(scrollPane);
-		f2.add(comboAnnotations);
-		populateDropdown();
-		
-		f2.add(textField);
-		textField.setPreferredSize(new Dimension(100, 30));
-		f2.add(save);
-		f2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		// Create the panel for options
+		JPanel entityPanel = new JPanel(new FlowLayout());
+		entityPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
-		JPanel b = new JPanel(new BorderLayout());
-		b.add(f1, BorderLayout.NORTH);
-		b.add(f2, BorderLayout.SOUTH);
+		// Add the buttons to the panel
+		entityPanel.add(classes);
+		entityPanel.add(individuals);
+		entityPanel.add(objProp);
+		entityPanel.add(dataProp);
+		entityPanel.add(dataType);
+		entityPanel.add(annot);
+		entityPanel.add(classAx);
 
+		// Create the ItemListeners for the buttons
 		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
 		{
 			JRadioButton jrb = (JRadioButton) e.nextElement();
@@ -91,23 +91,51 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
-						JOptionPane.showMessageDialog(null, ((JRadioButton) ie.getSource()).getLabel());
+						JOptionPane.showMessageDialog(null, ((JRadioButton) ie.getSource()).getText());
 					}
 				}
 			});
 		}
-		
-		// Construct top level panel
-		setLayout(new BorderLayout());
-		this.add(f1, BorderLayout.NORTH);
-		this.add(f2, BorderLayout.CENTER);
 	}
-	
-	private void populateDropdown()
+
+	private void createEditorPanel()
 	{
-		// TODO: Add the rest of the annotation options
-		comboAnnotations.addItem("isNative");
-		comboAnnotations.addItem("isExternal");
-		comboAnnotations.addItem("NONE");
+		// TODO: remove hardcoded list data and replace with default selection
+		String[] data = { "one", "two", "three", "four" }; // this should be a call to the controller
+		JList<String> entityList = new JList<String>(data);
+		JScrollPane scrollPane = new JScrollPane(entityList);
+		scrollPane.setPreferredSize(new Dimension(100, 100));
+		
+		// Create the dropdown menu
+		JComboBox<String> comboAnnotations = new JComboBox<String>();
+		comboAnnotations.addItem("isNativeTo");
+		comboAnnotations.addItem("ofExternalType");
+		comboAnnotations.addItem("reusesPatternAsTemplate");
+		comboAnnotations.addItem("specializationOfModule");
+		comboAnnotations.addItem("generatlizationOfModule");
+		comboAnnotations.addItem("derivedFromModule");
+		comboAnnotations.addItem("hasRelatedModule");
+		comboAnnotations.addItem("specializationOfPattern");
+		comboAnnotations.addItem("generatlizationOfPattern");
+		comboAnnotations.addItem("derivedFromPattern");
+		comboAnnotations.addItem("hasRelatedPattern");
+		
+		// Create targetTextField
+		JTextField targetTextField = new JTextField();
+		targetTextField.setPreferredSize(new Dimension(100, 30));
+		
+		// Create the button for saving the annotation
+		JButton saveButton = new JButton("Save");
+		// TODO: add actionlistener for saving the annotation
+		
+		// Create the "editor" panel
+		JPanel f2 = new JPanel(new FlowLayout());
+		f2.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+		// Add everythin
+		f2.add(scrollPane);
+		f2.add(comboAnnotations);
+		f2.add(targetTextField);
+		f2.add(saveButton);
 	}
 }
