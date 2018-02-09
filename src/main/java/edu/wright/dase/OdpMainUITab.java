@@ -50,8 +50,6 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 			/* TODO: do more here
 			add(new EditorMenuBar(editor), BorderLayout.NORTH);
 
-			
-
 			JFrame mainWindow = (javax.swing.JFrame) SwingUtilities.windowForComponent(this);
 			editor.setProtegeMainWindow(mainWindow);
 			 */
