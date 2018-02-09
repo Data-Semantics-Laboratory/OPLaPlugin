@@ -22,9 +22,9 @@ import javax.swing.JTextField;
 public class OplaUI extends JPanel
 {
 
-	/** Bookkeeping  */
-	private static final long serialVersionUID = 1L;
-	
+	/** Bookkeeping */
+	private static final long	serialVersionUID	= 1L;
+
 	private FlowLayout			buttonLayout		= new FlowLayout();
 	private JRadioButton		classes				= new JRadioButton("Classes");
 	private JRadioButton		individuals			= new JRadioButton("Individuals");
@@ -41,7 +41,7 @@ public class OplaUI extends JPanel
 	public OplaUI()
 	{
 		// TODO: create methods for creating these outside of the constructor
-		
+
 		// Create the panel for options
 		JPanel f1 = new JPanel(new FlowLayout());
 		f1.add(classes);
@@ -62,7 +62,7 @@ public class OplaUI extends JPanel
 
 		// Create the "editor" panel
 		JPanel f2 = new JPanel(new FlowLayout());
-		
+
 		// TODO: remove hardcoded list data
 		String[] data = { "one", "two", "three", "four" };
 		JList<String> myList = new JList<String>(data);
@@ -71,7 +71,7 @@ public class OplaUI extends JPanel
 		f2.add(scrollPane);
 		f2.add(comboAnnotations);
 		populateDropdown();
-		
+
 		f2.add(textField);
 		textField.setPreferredSize(new Dimension(100, 30));
 		f2.add(save);
@@ -96,13 +96,13 @@ public class OplaUI extends JPanel
 				}
 			});
 		}
-		
+
 		// Construct top level panel
 		setLayout(new BorderLayout());
 		this.add(f1, BorderLayout.NORTH);
 		this.add(f2, BorderLayout.CENTER);
 	}
-	
+
 	private void populateDropdown()
 	{
 		// TODO: Add the rest of the annotation options
