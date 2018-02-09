@@ -101,8 +101,8 @@ public class OplaUI extends JPanel
 	private void createEditorPanel()
 	{
 		// TODO: remove hardcoded list data and replace with default selection
-		String[] data = { "one", "two", "three", "four" }; // this should be a call to the controller
-		JList<String> entityList = new JList<String>(data);
+		String[] classes = this.oplaController.retireveClasses(oplaController.getModelManager());
+		JList<String> entityList = new JList<String>(classes);
 		JScrollPane scrollPane = new JScrollPane(entityList);
 		scrollPane.setPreferredSize(new Dimension(100, 100));
 		
