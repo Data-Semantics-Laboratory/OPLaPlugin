@@ -33,6 +33,7 @@ public class OplaUI extends JPanel
 	
 	public OplaUI(OplaController oplaController)
 	{
+		// Save a reference to the controller
 		this.oplaController = oplaController;
 		
 		// Populate the panels
@@ -68,17 +69,18 @@ public class OplaUI extends JPanel
 		buttons.add(classAx);
 
 		// Create the panel for options
-		entityPanel.setLayout(new FlowLayout());
-		entityPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		this.entityPanel = new JPanel();
+		this.entityPanel.setLayout(new FlowLayout());
+		this.entityPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		// Add the buttons to the panel
-		entityPanel.add(classes);
-		entityPanel.add(individuals);
-		entityPanel.add(objProp);
-		entityPanel.add(dataProp);
-		entityPanel.add(dataType);
-		entityPanel.add(annot);
-		entityPanel.add(classAx);
+		this.entityPanel.add(classes);
+		this.entityPanel.add(individuals);
+		this.entityPanel.add(objProp);
+		this.entityPanel.add(dataProp);
+		this.entityPanel.add(dataType);
+		this.entityPanel.add(annot);
+		this.entityPanel.add(classAx);
 
 		// Create the ItemListeners for the buttons
 		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
@@ -101,7 +103,7 @@ public class OplaUI extends JPanel
 	private void createEditorPanel()
 	{
 		// TODO: remove hardcoded list data and replace with default selection
-		String[] classes = this.oplaController.retireveClasses(oplaController.getModelManager());
+		String[] classes = {"data"}; //this.oplaController.retireveClasses(oplaController.getModelManager());
 		JList<String> entityList = new JList<String>(classes);
 		JScrollPane scrollPane = new JScrollPane(entityList);
 		scrollPane.setPreferredSize(new Dimension(100, 100));
@@ -129,13 +131,14 @@ public class OplaUI extends JPanel
 		// TODO: add actionlistener for saving the annotation
 		
 		// Create the "editor" panel
-		editorPanel.setLayout(new FlowLayout());
-		editorPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		this.editorPanel = new JPanel();
+		this.editorPanel.setLayout(new FlowLayout());
+		this.editorPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
-		// Add everythin
-		editorPanel.add(scrollPane);
-		editorPanel.add(comboAnnotations);
-		editorPanel.add(targetTextField);
-		editorPanel.add(saveButton);
+		// Add everything to the panel
+		this.editorPanel.add(scrollPane);
+		this.editorPanel.add(comboAnnotations);
+		this.editorPanel.add(targetTextField);
+		this.editorPanel.add(saveButton);
 	}
 }
