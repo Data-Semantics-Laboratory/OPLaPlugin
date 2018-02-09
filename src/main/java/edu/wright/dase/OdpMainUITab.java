@@ -44,7 +44,7 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 			// Construct and populate the layout
 			setLayout(new BorderLayout());
 			
-			OplaUI oplaUI = new OplaUI();
+			OplaUI oplaUI = new OplaUI(new OplaController(this.modelManager));
 			add(oplaUI, BorderLayout.CENTER);
 			
 			/* TODO: do more here

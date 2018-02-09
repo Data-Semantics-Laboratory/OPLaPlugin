@@ -12,7 +12,7 @@ public enum Options
 		this.option = option;
 	}
 
-	private String option()
+	private String getValue()
 	{
 		return option;
 	}
