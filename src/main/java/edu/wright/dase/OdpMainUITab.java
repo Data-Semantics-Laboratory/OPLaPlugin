@@ -1,6 +1,10 @@
 package edu.wright.dase;
 
 import java.awt.BorderLayout;
+import java.awt.event.ItemEvent;
+
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -26,6 +30,9 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 	private OWLEditorKit			owlEditorKit;
 	private OWLEntityFinder			owlEntityFinder;
 
+	private OplaUI					oplaUI;
+	private OplaController			oplaController;
+
 	@Override
 	public void initialise()
 	{
@@ -34,7 +41,7 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		setToolTipText("OplaAnnotate");
 
 		this.modelManager = getOWLModelManager();
-		
+
 		// Ensure that there is a model manager before continuing.
 		if(this.modelManager != null)
 		{
@@ -43,18 +50,20 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 
 			// Construct and populate the layout
 			setLayout(new BorderLayout());
-			
-			OplaUI oplaUI = new OplaUI(new OplaController(this.modelManager));
-			add(oplaUI, BorderLayout.CENTER);
-			
-			/* TODO: do more here
-			add(new EditorMenuBar(editor), BorderLayout.NORTH);
 
-			JFrame mainWindow = (javax.swing.JFrame) SwingUtilities.windowForComponent(this);
-			editor.setProtegeMainWindow(mainWindow);
+			this.oplaController = new OplaController(this.modelManager);
+			this.oplaUI = new OplaUI(this.oplaController);
+			add(oplaUI, BorderLayout.CENTER);
+
+			/*
+			 * TODO: do more here add(new EditorMenuBar(editor),
+			 * BorderLayout.NORTH);
+			 * 
+			 * JFrame mainWindow = (javax.swing.JFrame)
+			 * SwingUtilities.windowForComponent(this);
+			 * editor.setProtegeMainWindow(mainWindow);
 			 */
-			
-			
+
 			// If there is an active ontology
 			if(this.modelManager.getActiveOntology() != null)
 			{
@@ -76,7 +85,13 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 
 	private void update()
 	{
-		// Update the view
+		if(this.oplaUI != null)
+		{
+			remove(this.oplaUI);
+		}
+		this.oplaUI = new OplaUI(this.oplaController);
+		add(oplaUI, BorderLayout.CENTER);
+
 	}
 
 	private class OplaTabListener implements OWLModelManagerListener
