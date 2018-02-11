@@ -5,28 +5,33 @@ import java.util.Set;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.PrefixManager;
+import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 public class OplaController
 {
-	private OWLModelManager modelManager;
-	private OWLOntology     owlOntology;
-	
+	private OWLModelManager	modelManager;
+	private OWLOntology		owlOntology;
+	private OWLDataFactory	owlDataFactory;
+
 	public OplaController(OWLModelManager modelManager)
 	{
 		this.modelManager = modelManager;
-		this.owlOntology  = modelManager.getActiveOntology();
+		this.update();
 	}
-	
+
 	public void update()
 	{
 		this.owlOntology = this.modelManager.getActiveOntology();
+		this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
 	}
-	
+
 	public Object[] retrieve(String option)
 	{
 		if(option.equals("Classes"))
@@ -59,52 +64,56 @@ public class OplaController
 		}
 		else
 		{
-			return new Object[] {"Error parsing option"};
+			return new Object[] { "Error parsing option" };
 		}
 	}
-	
+
 	private OWLClass[] retrieveClasses()
 	{
 		Set<OWLClass> set = this.owlOntology.getClassesInSignature();
 		OWLClass[] owlArr = set.toArray(new OWLClass[set.size()]);
 		return owlArr;
 	}
+
 	private OWLObjectProperty[] retrieveObjectProperties()
 	{
 		Set<OWLObjectProperty> set = this.owlOntology.getObjectPropertiesInSignature();
 		OWLObjectProperty[] owlArr = set.toArray(new OWLObjectProperty[set.size()]);
 		return owlArr;
 	}
+
 	private OWLNamedIndividual[] retrieveIndividuals()
 	{
 		Set<OWLNamedIndividual> set = this.owlOntology.getIndividualsInSignature();
 		OWLNamedIndividual[] owlArr = set.toArray(new OWLNamedIndividual[set.size()]);
 		return owlArr;
 	}
+
 	private OWLDataProperty[] retrieveDataProperties()
 	{
 		Set<OWLDataProperty> set = this.owlOntology.getDataPropertiesInSignature();
 		OWLDataProperty[] owlArr = set.toArray(new OWLDataProperty[set.size()]);
 		return owlArr;
 	}
+
 	private OWLDatatype[] retrieveDataTypes()
 	{
 		Set<OWLDatatype> set = this.owlOntology.getDatatypesInSignature();
 		OWLDatatype[] owlArr = set.toArray(new OWLDatatype[set.size()]);
 		return owlArr;
 	}
+
 	private OWLAnnotationProperty[] retrieveAnnotations()
 	{
 		Set<OWLAnnotationProperty> set = this.owlOntology.getAnnotationPropertiesInSignature();
-				OWLAnnotationProperty[] owlArr = set.toArray(new OWLAnnotationProperty[set.size()]);
+		OWLAnnotationProperty[] owlArr = set.toArray(new OWLAnnotationProperty[set.size()]);
 		return owlArr;
 	}
-/*	private OWLClass[] retrieveClassAxioms()
-	{
-		Set<OWLObjectProperty> set = this.owlOntology.getObjectPropertiesInSignature();
-		OWLClass[] owlArr = set.toArray(new OWLClass[set.size()]);
-		return owlArr;
-	}*/
+	/*
+	 * private OWLClass[] retrieveClassAxioms() { Set<OWLObjectProperty> set =
+	 * this.owlOntology.getObjectPropertiesInSignature(); OWLClass[] owlArr =
+	 * set.toArray(new OWLClass[set.size()]); return owlArr; }
+	 */
 
 	public OWLModelManager getModelManager()
 	{
@@ -114,6 +123,11 @@ public class OplaController
 	public void setModelManager(OWLModelManager modelManager)
 	{
 		this.modelManager = modelManager;
+	}
+
+	public void makeAnnotation(Object owlObject, String comboString, String textFieldString)
+	{
+		
 	}
 
 }

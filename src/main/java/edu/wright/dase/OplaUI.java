@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Enumeration;
@@ -22,28 +24,30 @@ import javax.swing.JTextField;
 public class OplaUI extends JPanel
 {
 	/** Bookkeeping */
-	private static final long	serialVersionUID	= 1L;
-
+	private static final long			serialVersionUID	= 1L;
 
 	/** Panels! */
-	private JPanel				entityPanel;
-	private JPanel				editorPanel;
+	private JPanel						entityPanel;
+	private JPanel						editorPanel;
 	/** The Controller */
-	private OplaController oplaController;
-	
-	private DefaultListModel<Object> entityListModel;
-	private JList<Object> entityList;
-	private JScrollPane entityScrollPane;
-	
+	private OplaController				oplaController;
+
+	private DefaultListModel<Object>	entityListModel;
+	private JList<Object>				entityList;
+	private JScrollPane					entityScrollPane;
+	private JComboBox<String>			comboAnnotations;
+	private JTextField					targetTextField;
+
 	public OplaUI(OplaController oplaController)
 	{
 		// Save a reference to the controller
 		this.oplaController = oplaController;
-		
+
 		// Construct the default DLM
-		this.entityListModel = new DefaultListModel<>();;
+		this.entityListModel = new DefaultListModel<>();
+		;
 		entityListModel.addElement("Open an Ontology");
-		
+
 		// Populate the panels
 		createEntityPanel();
 		createEditorPanel();
@@ -53,7 +57,7 @@ public class OplaUI extends JPanel
 		this.add(this.entityPanel, BorderLayout.NORTH);
 		this.add(this.editorPanel, BorderLayout.CENTER);
 	}
-	
+
 	private void createEntityPanel()
 	{
 		// Create the buttons
@@ -107,7 +111,7 @@ public class OplaUI extends JPanel
 						{
 							entityListModel.addElement(o);
 						}
-					}	
+					}
 				}
 			});
 		}
@@ -119,9 +123,9 @@ public class OplaUI extends JPanel
 		this.entityList.setModel(this.entityListModel);
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
-		
+
 		// Create the dropdown menu
-		JComboBox<String> comboAnnotations = new JComboBox<String>();
+		comboAnnotations = new JComboBox<String>();
 		comboAnnotations.addItem("isNativeTo");
 		comboAnnotations.addItem("ofExternalType");
 		comboAnnotations.addItem("reusesPatternAsTemplate");
@@ -133,15 +137,26 @@ public class OplaUI extends JPanel
 		comboAnnotations.addItem("generatlizationOfPattern");
 		comboAnnotations.addItem("derivedFromPattern");
 		comboAnnotations.addItem("hasRelatedPattern");
-		
+
 		// Create targetTextField
-		JTextField targetTextField = new JTextField();
+		targetTextField = new JTextField();
 		targetTextField.setPreferredSize(new Dimension(100, 30));
-		
+
 		// Create the button for saving the annotation
 		JButton saveButton = new JButton("Save");
 		// TODO: add actionlistener for saving the annotation
-		
+
+		saveButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				Object owlObject = entityList.getSelectedValue();
+				String comboString = comboAnnotations.getSelectedItem().toString();
+				String textFieldString = targetTextField.getText();
+			}
+		});
+
 		// Create the "editor" panel
 		this.editorPanel = new JPanel();
 		this.editorPanel.setLayout(new FlowLayout());

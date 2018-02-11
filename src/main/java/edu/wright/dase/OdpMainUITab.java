@@ -78,12 +78,12 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 			{
 				remove(this.oplaUI);
 			}
-			
+
 			this.oplaUI = new OplaUI(this.oplaController);
 			add(this.oplaUI, BorderLayout.CENTER);
-			
+
 			validate();
-			
+
 			// Update the controller
 			this.oplaController.update();
 		}
@@ -94,9 +94,10 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		@Override
 		public void handleChange(OWLModelManagerChangeEvent event)
 		{
-			// If the underlying ontology has changed in some manner, update the view.
+			// If the underlying ontology has changed in some manner, update the
+			// view.
 			if(event.isType(EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
-					|| (event.isType(EventType.ONTOLOGY_RELOADED)))
+			        || (event.isType(EventType.ONTOLOGY_RELOADED)))
 			{
 				update();
 			}
