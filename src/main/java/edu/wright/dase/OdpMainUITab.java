@@ -24,14 +24,16 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 
 	/** For use in detecting changes in the underlying ontology */
 	private final OplaTabListener	oplaTabListener		= new OplaTabListener();
-
+	/** For accessing the underlying ontology */
 	private OWLModelManager			modelManager;
+
+	/** View and Controller */
+	private OplaUI					oplaUI;
+	private OplaController			oplaController;
+
 	/** Not sure what these are for, yet */
 	private OWLEditorKit			owlEditorKit;
 	private OWLEntityFinder			owlEntityFinder;
-
-	private OplaUI					oplaUI;
-	private OplaController			oplaController;
 
 	@Override
 	public void initialise()
@@ -39,7 +41,6 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		// Set up
 		super.initialise();
 		setToolTipText("OplaAnnotate");
-
 		this.modelManager = getOWLModelManager();
 
 		// Ensure that there is a model manager before continuing.
@@ -47,28 +48,12 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		{
 			// Continue set up
 			this.modelManager.addListener(this.oplaTabListener);
+			this.oplaController = new OplaController(this.modelManager);
 
 			// Construct and populate the layout
 			setLayout(new BorderLayout());
 
-			this.oplaController = new OplaController(this.modelManager);
-			this.oplaUI = new OplaUI(this.oplaController);
-			add(oplaUI, BorderLayout.CENTER);
-
-			/*
-			 * TODO: do more here add(new EditorMenuBar(editor),
-			 * BorderLayout.NORTH);
-			 * 
-			 * JFrame mainWindow = (javax.swing.JFrame)
-			 * SwingUtilities.windowForComponent(this);
-			 * editor.setProtegeMainWindow(mainWindow);
-			 */
-
-			// If there is an active ontology
-			if(this.modelManager.getActiveOntology() != null)
-			{
-				update();
-			}
+			update();
 		}
 		else // output warning to log, do not initialize further
 		{
@@ -85,13 +70,23 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 
 	private void update()
 	{
-		if(this.oplaUI != null)
+		// If there is an active ontology
+		if(this.modelManager.getActiveOntology() != null)
 		{
-			remove(this.oplaUI);
+			// Update the tab. Remove and reconstruct the tab, if necessary.
+			if(this.oplaUI != null)
+			{
+				remove(this.oplaUI);
+			}
+			
+			this.oplaUI = new OplaUI(this.oplaController);
+			add(this.oplaUI, BorderLayout.CENTER);
+			
+			validate();
+			
+			// Update the controller
+			this.oplaController.update();
 		}
-		this.oplaUI = new OplaUI(this.oplaController);
-		add(oplaUI, BorderLayout.CENTER);
-
 	}
 
 	private class OplaTabListener implements OWLModelManagerListener
@@ -99,8 +94,9 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		@Override
 		public void handleChange(OWLModelManagerChangeEvent event)
 		{
-			// If the underlying ontology has changed, change the view.
-			if(event.getType() == EventType.ACTIVE_ONTOLOGY_CHANGED)
+			// If the underlying ontology has changed in some manner, update the view.
+			if(event.isType(EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
+					|| (event.isType(EventType.ONTOLOGY_RELOADED)))
 			{
 				update();
 			}

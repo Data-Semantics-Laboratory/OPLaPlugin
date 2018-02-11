@@ -10,16 +10,14 @@ import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-
-import org.protege.editor.core.ModelManager;
 
 public class OplaUI extends JPanel
 {
@@ -33,13 +31,18 @@ public class OplaUI extends JPanel
 	/** The Controller */
 	private OplaController oplaController;
 	
+	private DefaultListModel<Object> entityListModel;
 	private JList<Object> entityList;
-	private Object[] owlArr;
+	private JScrollPane entityScrollPane;
 	
 	public OplaUI(OplaController oplaController)
 	{
 		// Save a reference to the controller
 		this.oplaController = oplaController;
+		
+		// Construct the default DLM
+		this.entityListModel = new DefaultListModel<>();;
+		entityListModel.addElement("Open an Ontology");
 		
 		// Populate the panels
 		createEntityPanel();
@@ -50,7 +53,7 @@ public class OplaUI extends JPanel
 		this.add(this.entityPanel, BorderLayout.NORTH);
 		this.add(this.editorPanel, BorderLayout.CENTER);
 	}
-
+	
 	private void createEntityPanel()
 	{
 		// Create the buttons
@@ -98,48 +101,13 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
-						//JOptionPane.showMessageDialog(null, ((JRadioButton) ie.getSource()).getText());
-						if(((JRadioButton) ie.getSource()).getText().equals("Classes"))
+						Object[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
+						entityListModel.removeAllElements();
+						for(Object o : arr)
 						{
-							owlArr = oplaController.retireveClasses(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
+							entityListModel.addElement(o);
 						}
-						else if(((JRadioButton) ie.getSource()).getText().equals("Individuals"))
-						{
-							owlArr = oplaController.retireveIndividuals(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
-						}
-						else if(((JRadioButton) ie.getSource()).getText().equals("Object Properties"))
-						{
-							owlArr = oplaController.retireveObjectProperties(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
-						}
-						else if(((JRadioButton) ie.getSource()).getText().equals("Data Properties"))
-						{
-							owlArr = oplaController.retireveDataProperties(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
-						}
-						else if(((JRadioButton) ie.getSource()).getText().equals("Data Types"))
-						{
-							owlArr = oplaController.retireveDataTypes(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
-						}
-						else if(((JRadioButton) ie.getSource()).getText().equals("Annotations"))
-						{
-							owlArr = oplaController.retireveAnnotations(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
-						}
-						else if(((JRadioButton) ie.getSource()).getText().equals("Class Axiom"))
-						{
-							owlArr = oplaController.retireveClasses(oplaController.getModelManager());
-							entityList = new JList<Object>(owlArr);
-						}
-						else
-						{
-							
-						}
-						validate();
-					}
+					}	
 				}
 			});
 		}
@@ -147,19 +115,10 @@ public class OplaUI extends JPanel
 
 	private void createEditorPanel()
 	{
-		// TODO: remove hardcoded list data and replace with default selection
-		if(oplaController.getModelManager().getActiveOntology() == null)
-		{
-			owlArr = new Object[1];
-			owlArr[0] = "Open an Ontology";
-		}
-		else
-		{
-
-		}
-		this.entityList = new JList<Object>(owlArr);
-		JScrollPane scrollPane = new JScrollPane(entityList);
-		scrollPane.setPreferredSize(new Dimension(500, 300));
+		this.entityList = new JList<Object>();
+		this.entityList.setModel(this.entityListModel);
+		this.entityScrollPane = new JScrollPane(this.entityList);
+		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
 		
 		// Create the dropdown menu
 		JComboBox<String> comboAnnotations = new JComboBox<String>();
@@ -189,7 +148,7 @@ public class OplaUI extends JPanel
 		this.editorPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 		// Add everything to the panel
-		this.editorPanel.add(scrollPane);
+		this.editorPanel.add(this.entityScrollPane);
 		this.editorPanel.add(comboAnnotations);
 		this.editorPanel.add(targetTextField);
 		this.editorPanel.add(saveButton);
