@@ -3,6 +3,7 @@ package edu.wright.dase;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.find.OWLEntityFinder;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -24,6 +25,7 @@ public class OplaController
 	private OWLModelManager	modelManager;
 	private OWLOntology		owlOntology;
 	private OWLDataFactory	owlDataFactory;
+	private OWLEntityFinder owlEntityFinder;
 
 	public OplaController(OWLModelManager modelManager)
 	{
@@ -35,6 +37,7 @@ public class OplaController
 	{
 		this.owlOntology = this.modelManager.getActiveOntology();
 		this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
+		this.owlEntityFinder = this.modelManager.getOWLEntityFinder();
 	}
 
 	public OWLEntity[] retrieve(String option)
@@ -130,10 +133,12 @@ public class OplaController
 		this.modelManager = modelManager;
 	}
 
-	public OWLAnnotationAssertionAxiom makeAnnotationAxiom(OWLEntity owlEntity, String comboString, String textFieldString)
+	public OWLAnnotationAssertionAxiom makeAnnotationAxiom(OWLEntity owlEntity, String comboString,
+	        String textFieldString)
 	{
 		OWLAnnotationProperty owlAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(IRI.create(comboString));
-		OWLLiteral owlLiteral = owlDataFactory.getOWLLiteral(textFieldString);
+		OWLDatatype owlDataType = this.owlEntityFinder.getOWLDatatype("rdfs:Literal");
+		OWLLiteral owlLiteral = owlDataFactory.getOWLLiteral(textFieldString, owlDataType);
 		OWLAnnotation owlAnnotation = owlDataFactory.getOWLAnnotation(owlAnnotationProperty, owlLiteral);
 		IRI temp = owlEntity.getIRI();
 		return owlDataFactory.getOWLAnnotationAssertionAxiom(temp, owlAnnotation);
@@ -147,7 +152,8 @@ public class OplaController
 
 	public void addAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
 	{
-		AddAxiom addAxiom = new AddAxiom(this.owlOntology, makeAnnotationAxiom(owlEntity, comboString, textFieldString));
+		AddAxiom addAxiom = new AddAxiom(this.owlOntology,
+		        makeAnnotationAxiom(owlEntity, comboString, textFieldString));
 		applyDirectChange(addAxiom);
 	}
 
