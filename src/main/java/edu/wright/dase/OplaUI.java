@@ -111,9 +111,9 @@ public class OplaUI extends JPanel
 					{
 						if(isFiltered)
 						{
-							OWLEntity[] arr = oplaController.filter(((JRadioButton) ie.getSource()).getText());
+							OWLEntity[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
 							entityListModel.removeAllElements();
-							for(OWLEntity o : arr)
+							for(OWLEntity o : oplaController.filter(arr))
 							{
 								if(true)
 								{

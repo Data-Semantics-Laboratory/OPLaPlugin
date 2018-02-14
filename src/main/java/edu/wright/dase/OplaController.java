@@ -49,7 +49,7 @@ public class OplaController
 				owlDataFactory.getOWLAnnotationProperty(IRI.create("derivedFromPattern")),
 				owlDataFactory.getOWLAnnotationProperty(IRI.create("hasRelatedPattern")));
 		this.oplaAnnotations = new HashSet<>(oplaList);
-		this.oplaAnnotations =  new HashSet<OWLAnnotationProperty>();
+		//this.oplaAnnotations =  new HashSet<OWLAnnotationProperty>();
 	}
 
 	public void update()
@@ -94,59 +94,34 @@ public class OplaController
 			return null;
 		}
 	}
+	
+	public List<OWLEntity> filter(OWLEntity[] entities)
+    {
+        List<OWLEntity> filtered = new ArrayList<>();
 
-	public OWLEntity[] filter(String option)
-	{
-		if(option.equals("Classes"))
-		{
-			OWLClass[] arr = this.retrieveClasses();
-			ArrayList<OWLClass> temp = new ArrayList<>();
-			for(OWLClass o : arr)
-			{
-				temp.add(o);
-			}
-			for(OWLClass o : temp)
-			{
-				for(OWLAnnotationProperty a : oplaAnnotations)
-				{
-					if(o.getAnnotationPropertiesInSignature() == a)
-					{
-						temp.remove(o);
-					}
-				}
-			}
-			OWLClass[] owlArr = (OWLClass[]) temp.toArray();
-			return owlArr;
-		}
-		else if(option.equals("Individuals"))
-		{
-			return this.retrieveIndividuals();
-		}
-		else if(option.equals("Object Properties"))
-		{
-			return this.retrieveObjectProperties();
-		}
-		else if(option.equals("Data Properties"))
-		{
-			return this.retrieveDataProperties();
-		}
-		else if(option.equals("Data Types"))
-		{
-			return this.retrieveDataTypes();
-		}
-		else if(option.equals("Annotations"))
-		{
-			return this.retrieveAnnotations();
-		}
-		else if(option.equals("Class Axiom"))
-		{
-			return this.retrieveClasses();
-		}
-		else
-		{
-			return null;
-		}
-	}
+        for(OWLEntity e : entities)
+        {
+            if(!containsOplaAnnotation(e))
+            {
+                filtered.add(e);
+            }
+        }
+
+        return filtered;
+    }
+
+    private boolean containsOplaAnnotation(OWLEntity e)
+    {
+        for(OWLAnnotationProperty prop : oplaAnnotations)
+        {
+            if(e.containsEntityInSignature(prop))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	private OWLClass[] retrieveClasses()
 	{
