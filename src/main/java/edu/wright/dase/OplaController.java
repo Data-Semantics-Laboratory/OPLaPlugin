@@ -3,16 +3,21 @@ package edu.wright.dase;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.PrefixManager;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 
 public class OplaController
 {
@@ -32,7 +37,7 @@ public class OplaController
 		this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
 	}
 
-	public Object[] retrieve(String option)
+	public OWLEntity[] retrieve(String option)
 	{
 		if(option.equals("Classes"))
 		{
@@ -64,7 +69,7 @@ public class OplaController
 		}
 		else
 		{
-			return new Object[] { "Error parsing option" };
+			return null;
 		}
 	}
 
@@ -125,9 +130,25 @@ public class OplaController
 		this.modelManager = modelManager;
 	}
 
-	public void makeAnnotation(Object owlObject, String comboString, String textFieldString)
+	public OWLAnnotationAssertionAxiom makeAnnotationAxiom(OWLEntity owlEntity, String comboString, String textFieldString)
 	{
-		
+		OWLAnnotationProperty owlAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(IRI.create(comboString));
+		OWLLiteral owlLiteral = owlDataFactory.getOWLLiteral(textFieldString);
+		OWLAnnotation owlAnnotation = owlDataFactory.getOWLAnnotation(owlAnnotationProperty, owlLiteral);
+		IRI temp = owlEntity.getIRI();
+		return owlDataFactory.getOWLAnnotationAssertionAxiom(temp, owlAnnotation);
+
+	}
+
+	public void applyDirectChange(OWLOntologyChange owlOntologyChange)
+	{
+		modelManager.applyChange(owlOntologyChange);
+	}
+
+	public void addAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
+	{
+		AddAxiom addAxiom = new AddAxiom(this.owlOntology, makeAnnotationAxiom(owlEntity, comboString, textFieldString));
+		applyDirectChange(addAxiom);
 	}
 
 }

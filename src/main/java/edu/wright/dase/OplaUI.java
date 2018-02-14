@@ -21,6 +21,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.semanticweb.owlapi.model.OWLEntity;
+
 public class OplaUI extends JPanel
 {
 	/** Bookkeeping */
@@ -32,8 +34,8 @@ public class OplaUI extends JPanel
 	/** The Controller */
 	private OplaController				oplaController;
 
-	private DefaultListModel<Object>	entityListModel;
-	private JList<Object>				entityList;
+	private DefaultListModel<OWLEntity>	entityListModel;
+	private JList<OWLEntity>			entityList;
 	private JScrollPane					entityScrollPane;
 	private JComboBox<String>			comboAnnotations;
 	private JTextField					targetTextField;
@@ -45,8 +47,6 @@ public class OplaUI extends JPanel
 
 		// Construct the default DLM
 		this.entityListModel = new DefaultListModel<>();
-		;
-		entityListModel.addElement("Open an Ontology");
 
 		// Populate the panels
 		createEntityPanel();
@@ -105,9 +105,9 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
-						Object[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
+						OWLEntity[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
 						entityListModel.removeAllElements();
-						for(Object o : arr)
+						for(OWLEntity o : arr)
 						{
 							entityListModel.addElement(o);
 						}
@@ -119,7 +119,7 @@ public class OplaUI extends JPanel
 
 	private void createEditorPanel()
 	{
-		this.entityList = new JList<Object>();
+		this.entityList = new JList<>();
 		this.entityList.setModel(this.entityListModel);
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
@@ -144,16 +144,16 @@ public class OplaUI extends JPanel
 
 		// Create the button for saving the annotation
 		JButton saveButton = new JButton("Save");
-		// TODO: add actionlistener for saving the annotation
 
 		saveButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				Object owlObject = entityList.getSelectedValue();
+				OWLEntity owlEntity = entityList.getSelectedValue();
 				String comboString = comboAnnotations.getSelectedItem().toString();
 				String textFieldString = targetTextField.getText();
+				oplaController.addAnnotation(owlEntity, comboString, textFieldString);
 			}
 		});
 
