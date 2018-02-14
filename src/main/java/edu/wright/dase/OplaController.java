@@ -1,5 +1,9 @@
 package edu.wright.dase;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
@@ -22,15 +26,30 @@ import org.semanticweb.owlapi.model.OWLOntologyChange;
 
 public class OplaController
 {
-	private OWLModelManager	modelManager;
-	private OWLOntology		owlOntology;
-	private OWLDataFactory	owlDataFactory;
-	private OWLEntityFinder owlEntityFinder;
+	private OWLModelManager				modelManager;
+	private OWLOntology					owlOntology;
+	private OWLDataFactory				owlDataFactory;
+	private OWLEntityFinder				owlEntityFinder;
+	private Set<OWLAnnotationProperty>	oplaAnnotations;
+	private List<OWLAnnotationProperty>	oplaList;
 
 	public OplaController(OWLModelManager modelManager)
 	{
 		this.modelManager = modelManager;
 		this.update();
+		this.oplaList = Arrays.asList(owlDataFactory.getOWLAnnotationProperty(IRI.create("isNativeTo")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("ofExternalType")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("reusesPatternAsTemplate")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("specializationOfModule")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("generatlizationOfModule")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("derivedFromModule")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("hasRelatedModule")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("specializationOfPattern")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("generatlizationOfPattern")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("derivedFromPattern")),
+				owlDataFactory.getOWLAnnotationProperty(IRI.create("hasRelatedPattern")));
+		this.oplaAnnotations = new HashSet<>(oplaList);
+		this.oplaAnnotations =  new HashSet<OWLAnnotationProperty>();
 	}
 
 	public void update()
@@ -45,6 +64,59 @@ public class OplaController
 		if(option.equals("Classes"))
 		{
 			return this.retrieveClasses();
+		}
+		else if(option.equals("Individuals"))
+		{
+			return this.retrieveIndividuals();
+		}
+		else if(option.equals("Object Properties"))
+		{
+			return this.retrieveObjectProperties();
+		}
+		else if(option.equals("Data Properties"))
+		{
+			return this.retrieveDataProperties();
+		}
+		else if(option.equals("Data Types"))
+		{
+			return this.retrieveDataTypes();
+		}
+		else if(option.equals("Annotations"))
+		{
+			return this.retrieveAnnotations();
+		}
+		else if(option.equals("Class Axiom"))
+		{
+			return this.retrieveClasses();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public OWLEntity[] filter(String option)
+	{
+		if(option.equals("Classes"))
+		{
+			OWLClass[] arr = this.retrieveClasses();
+			ArrayList<OWLClass> temp = new ArrayList<>();
+			for(OWLClass o : arr)
+			{
+				temp.add(o);
+			}
+			for(OWLClass o : temp)
+			{
+				for(OWLAnnotationProperty a : oplaAnnotations)
+				{
+					if(o.getAnnotationPropertiesInSignature() == a)
+					{
+						temp.remove(o);
+					}
+				}
+			}
+			OWLClass[] owlArr = (OWLClass[]) temp.toArray();
+			return owlArr;
 		}
 		else if(option.equals("Individuals"))
 		{

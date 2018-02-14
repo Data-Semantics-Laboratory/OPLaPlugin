@@ -14,6 +14,7 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -21,6 +22,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owlapi.model.OWLEntity;
 
 public class OplaUI extends JPanel
@@ -39,6 +41,8 @@ public class OplaUI extends JPanel
 	private JScrollPane					entityScrollPane;
 	private JComboBox<String>			comboAnnotations;
 	private JTextField					targetTextField;
+
+	private boolean						isFiltered;
 
 	public OplaUI(OplaController oplaController)
 	{
@@ -105,11 +109,26 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
-						OWLEntity[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
-						entityListModel.removeAllElements();
-						for(OWLEntity o : arr)
+						if(isFiltered)
 						{
-							entityListModel.addElement(o);
+							OWLEntity[] arr = oplaController.filter(((JRadioButton) ie.getSource()).getText());
+							entityListModel.removeAllElements();
+							for(OWLEntity o : arr)
+							{
+								if(true)
+								{
+									entityListModel.addElement(o);
+								}
+							}
+						}
+						else
+						{
+							OWLEntity[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
+							entityListModel.removeAllElements();
+							for(OWLEntity o : arr)
+							{
+								entityListModel.addElement(o);
+							}
 						}
 					}
 				}
@@ -123,6 +142,27 @@ public class OplaUI extends JPanel
 		this.entityList.setModel(this.entityListModel);
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
+
+		JCheckBox filter = new JCheckBox("View Only Un-annotated Entities");
+		filter.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent ie)
+			{
+				if(ie.getStateChange() == ItemEvent.SELECTED)
+				{
+					isFiltered = true;
+				}
+				else if(ie.getStateChange() == ItemEvent.DESELECTED)
+				{
+					isFiltered = false;
+				}
+				else
+				{
+					// Trailing Else
+				}
+			}
+		});
 
 		// Create the dropdown menu
 		comboAnnotations = new JComboBox<String>();
@@ -164,6 +204,7 @@ public class OplaUI extends JPanel
 
 		// Add everything to the panel
 		this.editorPanel.add(this.entityScrollPane);
+		this.editorPanel.add(filter);
 		this.editorPanel.add(comboAnnotations);
 		this.editorPanel.add(targetTextField);
 		this.editorPanel.add(saveButton);
