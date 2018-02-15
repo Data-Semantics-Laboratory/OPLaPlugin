@@ -52,8 +52,12 @@ public class OplaController
 		{
 			this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
 			this.owlEntityFinder = this.modelManager.getOWLEntityFinder();
-			// create the list of annotation properties
-			this.oplaAnnotations = createAnnotationPropertyList();
+			
+			if(this.oplaAnnotations == null)
+			{
+				// create the list of annotation properties
+				this.oplaAnnotations = createAnnotationPropertyList();
+			}
 		}
 	}
 
