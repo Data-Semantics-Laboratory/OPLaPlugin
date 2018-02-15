@@ -3,11 +3,12 @@
 
 <plugin>
 
-	<extension id="SWRLTab" point="org.protege.editor.core.application.WorkspaceTab">
-		<label value="OWLAx"/>
-		<class value="edu.wright.dase.OdpMainUITab"/>
-		<index value="X"/>
-		<editorKitId value="OWLEditorKit"/>
-  </extension>  
+	<extension id="OPLaTab"
+		point="org.protege.editor.core.application.WorkspaceViewsTab">
+		<label value="OPLa" />
+		<class value="edu.wright.dase.OdpMainUITab" />
+		<index value="X" />
+		<editorKitId value="OWLEditorKit" />
+	</extension>
 
 </plugin>
