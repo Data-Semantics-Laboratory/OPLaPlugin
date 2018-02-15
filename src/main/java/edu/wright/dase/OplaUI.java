@@ -1,6 +1,7 @@
 package edu.wright.dase;
 
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -9,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -22,7 +24,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owlapi.model.OWLEntity;
 
 public class OplaUI extends JPanel
@@ -42,7 +43,9 @@ public class OplaUI extends JPanel
 	private JComboBox<String>			comboAnnotations;
 	private JTextField					targetTextField;
 
-	private boolean						isFiltered;
+	private ButtonGroup					buttons;
+
+	private JCheckBox					filterCheckBox;
 
 	public OplaUI(OplaController oplaController)
 	{
@@ -73,16 +76,18 @@ public class OplaUI extends JPanel
 		JRadioButton annot = new JRadioButton("Annotations");
 		JRadioButton classAx = new JRadioButton("Class Axioms");
 
-		// TODO: set default selection
+		// Set the default Selection
+		classes.setSelected(true);
+
 		// Add the buttons to a buttongroup
-		ButtonGroup buttons = new ButtonGroup();
-		buttons.add(classes);
-		buttons.add(individuals);
-		buttons.add(objProp);
-		buttons.add(dataProp);
-		buttons.add(dataType);
-		buttons.add(annot);
-		buttons.add(classAx);
+		this.buttons = new ButtonGroup();
+		this.buttons.add(classes);
+		this.buttons.add(individuals);
+		this.buttons.add(objProp);
+		this.buttons.add(dataProp);
+		this.buttons.add(dataType);
+		this.buttons.add(annot);
+		this.buttons.add(classAx);
 
 		// Create the panel for options
 		this.entityPanel = new JPanel();
@@ -109,31 +114,43 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
-						if(isFiltered)
-						{
-							OWLEntity[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
-							entityListModel.removeAllElements();
-							for(OWLEntity o : oplaController.filter(arr))
-							{
-								if(true)
-								{
-									entityListModel.addElement(o);
-								}
-							}
-						}
-						else
-						{
-							OWLEntity[] arr = oplaController.retrieve(((JRadioButton) ie.getSource()).getText());
-							entityListModel.removeAllElements();
-							for(OWLEntity o : arr)
-							{
-								entityListModel.addElement(o);
-							}
-						}
+						String selectedEntity = ((JRadioButton) ie.getSource()).getText();
+						boolean isFiltered = filterCheckBox.isSelected();
+						updateEntityList(selectedEntity, isFiltered);
 					}
 				}
 			});
 		}
+	}
+
+	private void updateEntityList(String selectedEntity, boolean isFiltered)
+	{
+		// Get the list of the required entities
+		List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity, isFiltered);
+		// clear the current list
+		entityListModel.removeAllElements();
+		// Add all the elements to the list model
+		retrievedEntities.forEach(e ->entityListModel.addElement(e));
+	}
+
+	private String findSelectedEntityOption()
+	{
+		// Loop through the buttons of the button group
+		// This is better than accessing the stupid selection model
+		// See:
+		// https://stackoverflow.com/questions/201287/how-do-i-get-which-jradiobutton-is-selected-from-a-buttongroup
+		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
+		{
+			JButton button = (JButton) e.nextElement();
+			if(button.isSelected())
+			{
+				return button.getText();
+			}
+		}
+
+		// This will never be returned as there is a default radiobutton
+		// selection
+		return "";
 	}
 
 	private void createEditorPanel()
@@ -143,24 +160,17 @@ public class OplaUI extends JPanel
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
 
-		JCheckBox filter = new JCheckBox("View Only Un-annotated Entities");
-		filter.addItemListener(new ItemListener()
+		this.filterCheckBox = new JCheckBox("View Only Un-annotated Entities");
+
+		this.filterCheckBox.addItemListener(new ItemListener()
 		{
 			@Override
 			public void itemStateChanged(ItemEvent ie)
 			{
-				if(ie.getStateChange() == ItemEvent.SELECTED)
-				{
-					isFiltered = true;
-				}
-				else if(ie.getStateChange() == ItemEvent.DESELECTED)
-				{
-					isFiltered = false;
-				}
-				else
-				{
-					// Trailing Else
-				}
+				String selectedEntity = findSelectedEntityOption();
+				boolean toFilter = ie.getStateChange() == ItemEvent.SELECTED;
+
+				updateEntityList(selectedEntity, toFilter);
 			}
 		});
 
@@ -204,7 +214,7 @@ public class OplaUI extends JPanel
 
 		// Add everything to the panel
 		this.editorPanel.add(this.entityScrollPane);
-		this.editorPanel.add(filter);
+		this.editorPanel.add(filterCheckBox);
 		this.editorPanel.add(comboAnnotations);
 		this.editorPanel.add(targetTextField);
 		this.editorPanel.add(saveButton);
