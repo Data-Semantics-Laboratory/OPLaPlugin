@@ -40,8 +40,6 @@ public class OplaController
 	public OplaController(OWLModelManager modelManager)
 	{
 		this.modelManager = modelManager;
-		// create the list of annotation properties
-		this.oplaAnnotations = createAnnotationPropertyList();
 		// set model dependent items
 		this.update();
 	}
@@ -50,8 +48,13 @@ public class OplaController
 	public void update()
 	{
 		this.owlOntology = this.modelManager.getActiveOntology();
-		this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
-		this.owlEntityFinder = this.modelManager.getOWLEntityFinder();
+		if(this.owlOntology != null)
+		{
+			this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
+			this.owlEntityFinder = this.modelManager.getOWLEntityFinder();
+			// create the list of annotation properties
+			this.oplaAnnotations = createAnnotationPropertyList();
+		}
 	}
 
 	private HashSet<OWLAnnotationProperty> createAnnotationPropertyList()

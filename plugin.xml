@@ -4,7 +4,7 @@
 <plugin>
 
 	<extension id="OPLaTab"
-		point="org.protege.editor.core.application.WorkspaceViewsTab">
+		point="org.protege.editor.core.application.WorkspaceTab">
 		<label value="OPLa" />
 		<class value="edu.wright.dase.OdpMainUITab" />
 		<index value="X" />

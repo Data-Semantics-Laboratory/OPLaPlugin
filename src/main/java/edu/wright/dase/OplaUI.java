@@ -1,7 +1,6 @@
 package edu.wright.dase;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -25,12 +24,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OplaUI extends JPanel
 {
 	/** Bookkeeping */
 	private static final long			serialVersionUID	= 1L;
-
+	private final Logger				log	= LoggerFactory.getLogger(OplaUI.class);
+	
 	/** Panels! */
 	private JPanel						entityPanel;
 	private JPanel						editorPanel;
@@ -125,12 +127,20 @@ public class OplaUI extends JPanel
 
 	private void updateEntityList(String selectedEntity, boolean isFiltered)
 	{
-		// Get the list of the required entities
-		List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity, isFiltered);
-		// clear the current list
-		entityListModel.removeAllElements();
-		// Add all the elements to the list model
-		retrievedEntities.forEach(e ->entityListModel.addElement(e));
+		try
+		{
+			// Get the list of the required entities
+			List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity, isFiltered);
+			// clear the current list
+			entityListModel.removeAllElements();
+			// Add all the elements to the list model
+			retrievedEntities.forEach(e ->entityListModel.addElement(e));
+		}
+		catch(ClassCastException e)
+		{
+			log.debug(e.getMessage());
+		}
+
 	}
 
 	private String findSelectedEntityOption()

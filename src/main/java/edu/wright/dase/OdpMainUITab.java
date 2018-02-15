@@ -1,10 +1,6 @@
 package edu.wright.dase;
 
 import java.awt.BorderLayout;
-import java.awt.event.ItemEvent;
-
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -31,9 +27,8 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 	private OplaUI					oplaUI;
 	private OplaController			oplaController;
 
-	/** Not sure what these are for, yet */
+	/** Not sure what this is for, yet */
 	private OWLEditorKit			owlEditorKit;
-	private OWLEntityFinder			owlEntityFinder;
 
 	@Override
 	public void initialise()
@@ -42,6 +37,7 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		super.initialise();
 		setToolTipText("OplaAnnotate");
 		this.modelManager = getOWLModelManager();
+		this.owlEditorKit = getOWLEditorKit();
 
 		// Ensure that there is a model manager before continuing.
 		if(this.modelManager != null)
@@ -57,14 +53,13 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 		}
 		else // output warning to log, do not initialize further
 		{
-			log.warn("SWRLTab initialization failed - no model manager");
+			log.warn("OPLaTab initialization failed: no model manager");
 		}
 	}
 
 	@Override
 	public void dispose()
 	{
-		super.dispose();
 		getOWLModelManager().removeListener(this.oplaTabListener);
 	}
 
@@ -87,6 +82,10 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 			// Update the controller
 			this.oplaController.update();
 		}
+		else
+		{
+			log.warn("Abort Update: no active ontology.");
+		}
 	}
 
 	private class OplaTabListener implements OWLModelManagerListener
@@ -99,7 +98,14 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 			if(event.isType(EventType.ACTIVE_ONTOLOGY_CHANGED) || (event.isType(EventType.ONTOLOGY_LOADED))
 			        || (event.isType(EventType.ONTOLOGY_RELOADED)))
 			{
-				update();
+				try
+				{
+					update();
+				}
+				catch(Exception e)
+				{
+					log.warn("Exception thrown in update method.");
+				}
 			}
 		}
 	}
