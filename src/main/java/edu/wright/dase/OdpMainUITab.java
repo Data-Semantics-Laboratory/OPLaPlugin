@@ -105,6 +105,7 @@ public class OdpMainUITab extends OWLWorkspaceViewsTab
 				catch(Exception e)
 				{
 					log.warn("Exception thrown in update method.");
+					e.printStackTrace();
 				}
 			}
 		}
