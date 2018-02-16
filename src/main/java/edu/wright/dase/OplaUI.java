@@ -151,7 +151,7 @@ public class OplaUI extends JPanel
 		// https://stackoverflow.com/questions/201287/how-do-i-get-which-jradiobutton-is-selected-from-a-buttongroup
 		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
 		{
-			JButton button = (JButton) e.nextElement();
+			JRadioButton button = (JRadioButton) e.nextElement();
 			if(button.isSelected())
 			{
 				return button.getText();
