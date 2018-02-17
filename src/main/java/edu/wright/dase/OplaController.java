@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.find.OWLEntityFinder;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.PrefixDocumentFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -23,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,7 @@ public class OplaController
 	private OWLOntology					owlOntology;
 	private OWLDataFactory				owlDataFactory;
 	private OWLEntityFinder				owlEntityFinder;
+	private PrefixDocumentFormat		pdf;
 
 	public OplaController(OWLModelManager modelManager)
 	{
@@ -52,10 +56,21 @@ public class OplaController
 		{
 			this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
 			this.owlEntityFinder = this.modelManager.getOWLEntityFinder();
+
+			// The PrefixDocumentFormat allows us to access the namespaces
+			// contained in the ontology
+			this.pdf = (PrefixDocumentFormat) owlOntology.getOWLOntologyManager().getOntologyFormat(owlOntology);
+			// add the opla namespace to the ontology, if it isn't there.
+			if(this.pdf.containsPrefixMapping("opla:")) // colon is necessary
+			{
+				this.pdf.setPrefix("opla", "http://ontologydesignpatterns.org/opla");
+				log.warn("Added the opla namespace");
+			}
 			
+			// create the list of annotation properties,
+			//but only if it hasn't been done before.
 			if(this.oplaAnnotations == null)
 			{
-				// create the list of annotation properties
 				this.oplaAnnotations = createAnnotationPropertyList();
 			}
 		}
