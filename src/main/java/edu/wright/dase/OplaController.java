@@ -74,12 +74,12 @@ public class OplaController
 				try
 				{
 					this.modelManager.save();
+					log.info("[OplaController] Added 'opla' namespace");
 				}
 				catch(OWLOntologyStorageException e)
 				{
 					log.error("[OplaController] Could not save the ontology.");
 				}
-				log.info("[OplaController] Added 'opla' namespace");
 			}
 			else
 			{
