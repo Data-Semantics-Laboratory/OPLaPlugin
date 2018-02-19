@@ -3,13 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<!--this is comment -->
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<groupId>edu.wright.dase</groupId>
 	<artifactId>OPLaTab</artifactId>
 	<version>1.0.0</version>
@@ -17,7 +10,7 @@
 	<packaging>bundle</packaging>
 
 	<developers>
-			<developer>
+		<developer>
 			<name>Quinn Hirt</name>
 			<email>hirt.14@wright.edu</email>
 		</developer>
@@ -26,15 +19,15 @@
 			<email>shimizu.5@wright.edu</email>
 		</developer>
 	</developers>
-	
+
 	<scm>
 		<connection>scm:git:git@github.com:cogan-shimizu-wsu/oplaplugin.git</connection>
 		<developerConnection>scm:git:git@github.com:cogan-shimizu-wsu/oplaplugin.git</developerConnection>
 		<url>https://github.com/cogan-shimizu-wsu/oplaplugin.git</url>
-	  <tag>HEAD</tag>
+		<tag>HEAD</tag>
 	</scm>
-	
-	
+
+
 	<dependencies>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>

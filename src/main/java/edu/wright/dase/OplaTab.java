@@ -2,7 +2,6 @@ package edu.wright.dase;
 
 import java.awt.BorderLayout;
 
-import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
@@ -26,9 +25,6 @@ public class OplaTab extends OWLWorkspaceViewsTab
 	private OplaUI					oplaUI;
 	private OplaController			oplaController;
 
-	/** Not sure what this is for, yet */
-	private OWLEditorKit			owlEditorKit;
-
 	@Override
 	public void initialise()
 	{
@@ -36,7 +32,6 @@ public class OplaTab extends OWLWorkspaceViewsTab
 		super.initialise();
 		setToolTipText("OplaAnnotate");
 		this.modelManager = getOWLModelManager();
-		this.owlEditorKit = getOWLEditorKit();
 
 		// Ensure that there is a model manager before continuing.
 		if(this.modelManager != null)
