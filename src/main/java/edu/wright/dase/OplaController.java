@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class OplaController
 {
 	/** book keeping (literally) */
 	private final Logger				log	= LoggerFactory.getLogger(OplaController.class);
-	
+
 	private Set<OWLAnnotationProperty>	oplaAnnotations;
 
 	private OWLModelManager				modelManager;
@@ -50,31 +51,52 @@ public class OplaController
 	/** used to update data fields that are dependent on the modelManager */
 	public void update()
 	{
+		log.info("[OplaController] Starting Update.");
+		// Retrieve the active ontology
 		this.owlOntology = this.modelManager.getActiveOntology();
+		// Only continue with the update if there is an active ontology
 		if(this.owlOntology != null)
 		{
+			// DataFactory is used to create axioms to add to the ontology
 			this.owlDataFactory = owlOntology.getOWLOntologyManager().getOWLDataFactory();
+			// The EntitiyFinder allows us to find existing entities within the
+			// ontology
 			this.owlEntityFinder = this.modelManager.getOWLEntityFinder();
-
 			// The PrefixDocumentFormat allows us to access the namespaces
 			// contained in the ontology
 			this.pdf = (PrefixDocumentFormat) owlOntology.getOWLOntologyManager().getOntologyFormat(owlOntology);
-			// add the opla namespace to the ontology, if it isn't there.
-			if(this.pdf.containsPrefixMapping("opla:")) // colon is necessary
+			// Add the opla namespace to the ontology, if it isn't there.
+			if(!this.pdf.containsPrefixMapping("opla:")) // colon is necessary
 			{
+				// Set the prefix
 				this.pdf.setPrefix("opla", "http://ontologydesignpatterns.org/opla");
-				log.warn("Added the opla namespace");
+				// Immediately apply the change
+				try
+				{
+					this.modelManager.save();
+				}
+				catch(OWLOntologyStorageException e)
+				{
+					log.error("[OplaController] Could not save the ontology.");
+				}
+				log.info("[OplaController] Added 'opla' namespace");
 			}
-			
-			// create the list of annotation properties,
-			//but only if it hasn't been done before.
+			else
+			{
+				log.info("[OplaController] 'opla' namespace already present.");
+			}
+			// Create the list of annotation properties,
+			// but only if it hasn't been done before.
 			if(this.oplaAnnotations == null)
 			{
 				this.oplaAnnotations = createAnnotationPropertyList();
 			}
+			log.info("[OplaController] Active Ontology items updated.");
 		}
+		log.info("[OplaController] Update Completed.");
 	}
 
+	/** create the OWLAnnotation Properties that the plugin will use. */
 	private HashSet<OWLAnnotationProperty> createAnnotationPropertyList()
 	{
 		List<OWLAnnotationProperty> oplaList = Arrays.asList(
