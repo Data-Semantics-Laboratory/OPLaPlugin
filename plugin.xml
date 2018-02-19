@@ -6,7 +6,7 @@
 	<extension id="OPLaTab"
 		point="org.protege.editor.core.application.WorkspaceTab">
 		<label value="OPLa" />
-		<class value="edu.wright.dase.OdpMainUITab" />
+		<class value="edu.wright.dase.OplaTab" />
 		<index value="X" />
 		<editorKitId value="OWLEditorKit" />
 	</extension>

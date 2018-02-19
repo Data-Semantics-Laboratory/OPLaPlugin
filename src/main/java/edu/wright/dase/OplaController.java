@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.find.OWLEntityFinder;
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.PrefixDocumentFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
@@ -25,7 +24,6 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +31,7 @@ public class OplaController
 {
 	/** book keeping (literally) */
 	private final Logger				log	= LoggerFactory.getLogger(OplaController.class);
+	
 	private Set<OWLAnnotationProperty>	oplaAnnotations;
 
 	private OWLModelManager				modelManager;

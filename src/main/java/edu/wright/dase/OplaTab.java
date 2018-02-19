@@ -7,16 +7,15 @@ import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.model.find.OWLEntityFinder;
 import org.protege.editor.owl.ui.OWLWorkspaceViewsTab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OdpMainUITab extends OWLWorkspaceViewsTab
+public class OplaTab extends OWLWorkspaceViewsTab
 {
 	/** book keeping (literally) */
 	private static final long		serialVersionUID	= 1L;
-	private static final Logger		log					= LoggerFactory.getLogger(OdpMainUITab.class);
+	private static final Logger		log					= LoggerFactory.getLogger(OplaTab.class);
 
 	/** For use in detecting changes in the underlying ontology */
 	private final OplaTabListener	oplaTabListener		= new OplaTabListener();
