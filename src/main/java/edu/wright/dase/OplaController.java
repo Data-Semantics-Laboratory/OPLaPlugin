@@ -1,8 +1,7 @@
 package edu.wright.dase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -31,15 +30,17 @@ import org.slf4j.LoggerFactory;
 public class OplaController
 {
 	/** book keeping (literally) */
-	private final Logger				log	= LoggerFactory.getLogger(OplaController.class);
+	private final Logger							log		= LoggerFactory.getLogger(OplaController.class);
 
-	private Set<OWLAnnotationProperty>	oplaAnnotations;
+	private final static String						prefix	= "opla";
 
-	private OWLModelManager				modelManager;
-	private OWLOntology					owlOntology;
-	private OWLDataFactory				owlDataFactory;
-	private OWLEntityFinder				owlEntityFinder;
-	private PrefixDocumentFormat		pdf;
+	private HashMap<String, OWLAnnotationProperty>	oplaAnnotations;
+
+	private OWLModelManager							modelManager;
+	private OWLOntology								owlOntology;
+	private OWLDataFactory							owlDataFactory;
+	private OWLEntityFinder							owlEntityFinder;
+	private PrefixDocumentFormat					pdf;
 
 	public OplaController(OWLModelManager modelManager)
 	{
@@ -66,20 +67,11 @@ public class OplaController
 			// contained in the ontology
 			this.pdf = (PrefixDocumentFormat) owlOntology.getOWLOntologyManager().getOntologyFormat(owlOntology);
 			// Add the opla namespace to the ontology, if it isn't there.
-			if(!this.pdf.containsPrefixMapping("opla:")) // colon is necessary
+			if(!this.pdf.containsPrefixMapping(prefix + ":")) // colon is
+			                                                  // necessary
 			{
 				// Set the prefix
-				this.pdf.setPrefix("opla", "http://ontologydesignpatterns.org/opla");
-				// Immediately apply the change
-				try
-				{
-					this.modelManager.save();
-					log.info("[OplaController] Added 'opla' namespace");
-				}
-				catch(OWLOntologyStorageException e)
-				{
-					log.error("[OplaController] Could not save the ontology.");
-				}
+				this.pdf.setPrefix(prefix, "http://ontologydesignpatterns.org/opla#");
 			}
 			else
 			{
@@ -97,22 +89,26 @@ public class OplaController
 	}
 
 	/** create the OWLAnnotation Properties that the plugin will use. */
-	private HashSet<OWLAnnotationProperty> createAnnotationPropertyList()
+	private HashMap<String, OWLAnnotationProperty> createAnnotationPropertyList()
 	{
-		List<OWLAnnotationProperty> oplaList = Arrays.asList(
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("isNativeTo")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("ofExternalType")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("reusesPatternAsTemplate")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("specializationOfModule")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("generatlizationOfModule")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("derivedFromModule")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("hasRelatedModule")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("specializationOfPattern")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("generatlizationOfPattern")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("derivedFromPattern")),
-		        owlDataFactory.getOWLAnnotationProperty(IRI.create("hasRelatedPattern")));
-
-		return new HashSet<>(oplaList);
+		// Names of all the properties inside of OPLa
+		String[] props = { "isNativeTo", "ofExternalType", "reusesPatternAsTemplate", "specializationOfModule",
+		        "generatlizationOfModule", "derivedFromModule", "hasRelatedModule", "specializationOfPattern",
+		        "generatlizationOfPattern", "derivedFromPattern", "hasRelatedPattern" };
+		// Create a hashmap that links the "name"
+		// of the property to the property object
+		// We do this in order to access the properties by name in the
+		// makeAnnotation method
+		HashMap<String, OWLAnnotationProperty> oplaAnnotationProperties = new HashMap<>();
+		for(String prop : props)
+		{
+			// Create an IRI for the opla annotation property
+			IRI iri = IRI.create(this.pdf.getPrefix(prefix+":"), prop);
+			// Generate the annotation property for the iri
+			OWLAnnotationProperty annotationProperty = this.owlDataFactory.getOWLAnnotationProperty(iri);
+			oplaAnnotationProperties.put(prop, annotationProperty);
+		}
+		return oplaAnnotationProperties;
 	}
 
 	public List<OWLEntity> retrieve(String selectedEntity, boolean isFiltered)
@@ -178,14 +174,15 @@ public class OplaController
 
 	private boolean containsOplaAnnotation(OWLEntity e)
 	{
-		for(OWLAnnotationProperty prop : oplaAnnotations)
+		// Iterate through all the datatype properties
+		for(OWLAnnotationProperty prop : oplaAnnotations.values())
 		{
+			// And return true if there is an oplaannotation for the entity
 			if(e.containsEntityInSignature(prop))
 			{
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -235,28 +232,46 @@ public class OplaController
 		this.modelManager = modelManager;
 	}
 
+	/**
+	 * creates an annotationassertionaxiom to add to the ontology.
+	 * 
+	 * @param owlEntity
+	 *            the entity about which the assertion is being made (the
+	 *            subject)
+	 * @param comboString
+	 *            the annotation property
+	 * @param textFieldString
+	 *            of the annotation assertion
+	 */
 	public OWLAnnotationAssertionAxiom makeAnnotationAxiom(OWLEntity owlEntity, String comboString,
 	        String textFieldString)
 	{
-		OWLAnnotationProperty owlAnnotationProperty = owlDataFactory.getOWLAnnotationProperty(IRI.create(comboString));
+		// Retrieve the annotation property from the annotation list.
+		OWLAnnotationProperty owlAnnotationProperty = this.oplaAnnotations.get(comboString);
+		// Use the entityFinder to get the Literal Datatype
 		OWLDatatype owlDataType = this.owlEntityFinder.getOWLDatatype("rdfs:Literal");
+		// Construct a literal using the textfieldString
 		OWLLiteral owlLiteral = owlDataFactory.getOWLLiteral(textFieldString, owlDataType);
+		// Create the annotation
 		OWLAnnotation owlAnnotation = owlDataFactory.getOWLAnnotation(owlAnnotationProperty, owlLiteral);
+		// Get the iri from the entity
 		IRI temp = owlEntity.getIRI();
-		return owlDataFactory.getOWLAnnotationAssertionAxiom(temp, owlAnnotation);
-
+		// Make the assertion axiom using the above values
+		OWLAnnotationAssertionAxiom annotationAssertionAxiom = owlDataFactory.getOWLAnnotationAssertionAxiom(temp,
+		        owlAnnotation);
+		// Return it
+		return annotationAssertionAxiom;
 	}
 
-	public void applyDirectChange(OWLOntologyChange owlOntologyChange)
-	{
-		modelManager.applyChange(owlOntologyChange);
-	}
-
+	/** add the AnnotationAssertionAxiom to the ontology. */
 	public void addAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
 	{
-		AddAxiom addAxiom = new AddAxiom(this.owlOntology,
-		        makeAnnotationAxiom(owlEntity, comboString, textFieldString));
-		applyDirectChange(addAxiom);
+		// construct the annotation axiom from the items sent from the gui
+		OWLAnnotationAssertionAxiom annotationAssertionAxiom = makeAnnotationAxiom(owlEntity, comboString,
+		        textFieldString);
+		// Create the ontologychange
+		AddAxiom addAxiom = new AddAxiom(this.owlOntology, annotationAssertionAxiom);
+		// Apply it!
+		this.modelManager.applyChange(addAxiom);
 	}
-
 }
