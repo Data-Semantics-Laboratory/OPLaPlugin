@@ -83,7 +83,7 @@ public class OplaTab extends OWLWorkspaceViewsTab
 		}
 		else
 		{
-			log.warn("Abort Update: no active ontology.");
+			log.warn("[OplaTab] Abort Update: no active ontology.");
 		}
 	}
 
