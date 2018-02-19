@@ -103,7 +103,7 @@ public class OplaController
 		for(String prop : props)
 		{
 			// Create an IRI for the opla annotation property
-			IRI iri = IRI.create(this.pdf.getPrefix(prefix+":"), prop);
+			IRI iri = IRI.create(this.pdf.getPrefix(prefix + ":"), prop);
 			// Generate the annotation property for the iri
 			OWLAnnotationProperty annotationProperty = this.owlDataFactory.getOWLAnnotationProperty(iri);
 			oplaAnnotationProperties.put(prop, annotationProperty);
@@ -186,52 +186,6 @@ public class OplaController
 		return false;
 	}
 
-	private List<OWLEntity> retrieveClasses()
-	{
-		Set<OWLClass> set = this.owlOntology.getClassesInSignature();
-		return new ArrayList<OWLEntity>(set);
-	}
-
-	private List<OWLEntity> retrieveObjectProperties()
-	{
-		Set<OWLObjectProperty> set = this.owlOntology.getObjectPropertiesInSignature();
-		return new ArrayList<OWLEntity>(set);
-	}
-
-	private List<OWLEntity> retrieveIndividuals()
-	{
-		Set<OWLNamedIndividual> set = this.owlOntology.getIndividualsInSignature();
-		return new ArrayList<OWLEntity>(set);
-	}
-
-	private List<OWLEntity> retrieveDataProperties()
-	{
-		Set<OWLDataProperty> set = this.owlOntology.getDataPropertiesInSignature();
-		return new ArrayList<OWLEntity>(set);
-	}
-
-	private List<OWLEntity> retrieveDataTypes()
-	{
-		Set<OWLDatatype> set = this.owlOntology.getDatatypesInSignature();
-		return new ArrayList<OWLEntity>(set);
-	}
-
-	private List<OWLEntity> retrieveAnnotations()
-	{
-		Set<OWLAnnotationProperty> set = this.owlOntology.getAnnotationPropertiesInSignature();
-		return new ArrayList<OWLEntity>(set);
-	}
-
-	public OWLModelManager getModelManager()
-	{
-		return modelManager;
-	}
-
-	public void setModelManager(OWLModelManager modelManager)
-	{
-		this.modelManager = modelManager;
-	}
-
 	/**
 	 * creates an annotationassertionaxiom to add to the ontology.
 	 * 
@@ -273,5 +227,43 @@ public class OplaController
 		AddAxiom addAxiom = new AddAxiom(this.owlOntology, annotationAssertionAxiom);
 		// Apply it!
 		this.modelManager.applyChange(addAxiom);
+	}
+
+	/* *********************************************** */
+
+	private List<OWLEntity> retrieveClasses()
+	{
+		Set<OWLClass> set = this.owlOntology.getClassesInSignature();
+		return new ArrayList<OWLEntity>(set);
+	}
+
+	private List<OWLEntity> retrieveObjectProperties()
+	{
+		Set<OWLObjectProperty> set = this.owlOntology.getObjectPropertiesInSignature();
+		return new ArrayList<OWLEntity>(set);
+	}
+
+	private List<OWLEntity> retrieveIndividuals()
+	{
+		Set<OWLNamedIndividual> set = this.owlOntology.getIndividualsInSignature();
+		return new ArrayList<OWLEntity>(set);
+	}
+
+	private List<OWLEntity> retrieveDataProperties()
+	{
+		Set<OWLDataProperty> set = this.owlOntology.getDataPropertiesInSignature();
+		return new ArrayList<OWLEntity>(set);
+	}
+
+	private List<OWLEntity> retrieveDataTypes()
+	{
+		Set<OWLDatatype> set = this.owlOntology.getDatatypesInSignature();
+		return new ArrayList<OWLEntity>(set);
+	}
+
+	private List<OWLEntity> retrieveAnnotations()
+	{
+		Set<OWLAnnotationProperty> set = this.owlOntology.getAnnotationPropertiesInSignature();
+		return new ArrayList<OWLEntity>(set);
 	}
 }
