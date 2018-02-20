@@ -15,7 +15,6 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -83,7 +82,7 @@ public class OplaUI extends JPanel
 		JRadioButton classAx = new JRadioButton("Class Axioms");
 
 		// Set the default Selection
-		classes.setSelected(true);
+		classes.setSelected(true); // TODO fire the update entity list,
 
 		// Add the buttons to a buttongroup
 		this.buttons = new ButtonGroup();
@@ -153,16 +152,17 @@ public class OplaUI extends JPanel
 		this.entityList.setModel(this.entityListModel);
 		this.annotationList = new JList<>();
 		this.annotationList.setModel(this.annotationListModel);
-		entityList.addListSelectionListener(new ListSelectionListener()
+		
+		this.entityList.addListSelectionListener(new ListSelectionListener()
 		{
 
 			@Override
 			public void valueChanged(ListSelectionEvent lse)
 			{
-				int index = lse.getFirstIndex();
-				OWLEntity selectedEntity = entityListModel.getElementAt(index);
 				try
 				{
+					int index = lse.getFirstIndex();
+					OWLEntity selectedEntity = entityListModel.getElementAt(index);
 					// Get the list of the required entities
 					List<OWLEntity> retrievedAnnotations = oplaController.retrieveEntityAnnotations(selectedEntity);
 					// clear the current list
@@ -170,12 +170,19 @@ public class OplaUI extends JPanel
 					// Add all the elements to the list model
 					retrievedAnnotations.forEach(e -> annotationListModel.addElement(e));
 				}
+				catch(ArrayIndexOutOfBoundsException e)
+				{
+					// Don't do anything, this prevents the error when switching entity views
+				}
 				catch(ClassCastException e)
 				{
 					log.debug(e.getMessage());
 				}
 			}
 		});
+		
+		
+		
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
 		this.annotationScrollPane = new JScrollPane(this.annotationList);
