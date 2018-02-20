@@ -152,37 +152,41 @@ public class OplaUI extends JPanel
 		this.entityList.setModel(this.entityListModel);
 		this.annotationList = new JList<>();
 		this.annotationList.setModel(this.annotationListModel);
-		
+
 		this.entityList.addListSelectionListener(new ListSelectionListener()
 		{
-
 			@Override
 			public void valueChanged(ListSelectionEvent lse)
 			{
-				try
+				// prevents the functionality from firing twice
+				// see documentation on listselectionevent
+				if(!lse.getValueIsAdjusting()) 
 				{
-					int index = lse.getFirstIndex();
-					OWLEntity selectedEntity = entityListModel.getElementAt(index);
-					// Get the list of the required entities
-					List<OWLEntity> retrievedAnnotations = oplaController.retrieveEntityAnnotations(selectedEntity);
-					// clear the current list
-					annotationListModel.removeAllElements();
-					// Add all the elements to the list model
-					retrievedAnnotations.forEach(e -> annotationListModel.addElement(e));
-				}
-				catch(ArrayIndexOutOfBoundsException e)
-				{
-					// Don't do anything, this prevents the error when switching entity views
-				}
-				catch(ClassCastException e)
-				{
-					log.debug(e.getMessage());
+					try
+					{
+						int index = lse.getFirstIndex();
+						OWLEntity selectedEntity = entityListModel.getElementAt(index);
+						// Get the list of the required entities
+						List<OWLEntity> retrievedAnnotations = oplaController.retrieveEntityAnnotations(selectedEntity);
+						// clear the current list
+						annotationListModel.removeAllElements();
+						// Add all the elements to the list model
+						retrievedAnnotations.forEach(e -> annotationListModel.addElement(e));
+					}
+					catch(ArrayIndexOutOfBoundsException e)
+					{
+						// Don't do anything, this prevents the error when
+						// switching
+						// entity views
+					}
+					catch(ClassCastException e)
+					{
+						log.debug(e.getMessage());
+					}
 				}
 			}
 		});
-		
-		
-		
+
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
 		this.annotationScrollPane = new JScrollPane(this.annotationList);
