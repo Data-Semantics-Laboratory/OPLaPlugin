@@ -109,7 +109,7 @@ public class OplaController
 		return oplaAnnotationProperties;
 	}
 
-	public List<OWLEntity> retrieve(String selectedEntity, boolean isFiltered)
+	public List<OWLEntity> retrieve(String selectedEntity)
 	{
 		List<OWLEntity> retrievedEntities;
 
@@ -145,29 +145,7 @@ public class OplaController
 		{
 			retrievedEntities = new ArrayList<>();
 		}
-
-		if(isFiltered)
-		{
-			retrievedEntities = filter(retrievedEntities);
-		}
-
 		return retrievedEntities;
-
-	}
-
-	public List<OWLEntity> filter(List<OWLEntity> entities)
-	{
-		List<OWLEntity> filtered = new ArrayList<>();
-
-		for(OWLEntity e : entities)
-		{
-			if(!containsOplaAnnotation(e))
-			{
-				filtered.add(e);
-			}
-		}
-
-		return filtered;
 	}
 
 	private boolean containsOplaAnnotation(OWLEntity e)
@@ -264,4 +242,12 @@ public class OplaController
 		Set<OWLAnnotationProperty> set = this.owlOntology.getAnnotationPropertiesInSignature();
 		return new ArrayList<OWLEntity>(set);
 	}
+	
+	public List<OWLEntity> retrieveEntityAnnotations(OWLEntity selectedEntity)
+	{
+		Set<OWLAnnotationProperty> set = selectedEntity.getAnnotationPropertiesInSignature();
+		return new ArrayList<OWLEntity>(set);
+	}
+	
+	
 }

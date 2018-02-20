@@ -22,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.slf4j.Logger;
@@ -41,7 +43,10 @@ public class OplaUI extends JPanel
 
 	private DefaultListModel<OWLEntity>	entityListModel;
 	private JList<OWLEntity>			entityList;
+	private DefaultListModel<OWLEntity>	annotationListModel;
+	private JList<OWLEntity>			annotationList;
 	private JScrollPane					entityScrollPane;
+	private JScrollPane					annotationScrollPane;
 	private JComboBox<String>			comboAnnotations;
 	private JTextField					targetTextField;
 
@@ -56,6 +61,7 @@ public class OplaUI extends JPanel
 
 		// Construct the default DLM
 		this.entityListModel = new DefaultListModel<>();
+		this.annotationListModel = new DefaultListModel<>();
 
 		// Populate the panels
 		createEntityPanel();
@@ -117,20 +123,19 @@ public class OplaUI extends JPanel
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
 						String selectedEntity = ((JRadioButton) ie.getSource()).getText();
-						boolean isFiltered = filterCheckBox.isSelected();
-						updateEntityList(selectedEntity, isFiltered);
+						updateEntityList(selectedEntity);
 					}
 				}
 			});
 		}
 	}
-
-	private void updateEntityList(String selectedEntity, boolean isFiltered)
+	
+	private void updateEntityList(String selectedEntity)
 	{
 		try
 		{
 			// Get the list of the required entities
-			List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity, isFiltered);
+			List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity);
 			// clear the current list
 			entityListModel.removeAllElements();
 			// Add all the elements to the list model
@@ -143,46 +148,38 @@ public class OplaUI extends JPanel
 
 	}
 
-	private String findSelectedEntityOption()
-	{
-		// Loop through the buttons of the button group
-		// This is better than accessing the stupid selection model
-		// See:
-		// https://stackoverflow.com/questions/201287/how-do-i-get-which-jradiobutton-is-selected-from-a-buttongroup
-		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
-		{
-			JRadioButton button = (JRadioButton) e.nextElement();
-			if(button.isSelected())
-			{
-				return button.getText();
-			}
-		}
-
-		// This will never be returned as there is a default radiobutton
-		// selection
-		return "";
-	}
-
 	private void createEditorPanel()
 	{
 		this.entityList = new JList<>();
 		this.entityList.setModel(this.entityListModel);
-		this.entityScrollPane = new JScrollPane(this.entityList);
-		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
+		this.annotationList = new JList<>();
+		this.annotationList.setModel(this.annotationListModel);
+		annotationList.addListSelectionListener(new ListSelectionListener() {
 
-		this.filterCheckBox = new JCheckBox("View Only Un-annotated Entities");
-
-		this.filterCheckBox.addItemListener(new ItemListener()
-		{
 			@Override
-			public void itemStateChanged(ItemEvent ie)
+			public void valueChanged(ListSelectionEvent lse)
 			{
-				String selectedEntity = findSelectedEntityOption();
-				boolean toFilter = ie.getStateChange() == ItemEvent.SELECTED;
-
-				updateEntityList(selectedEntity, toFilter);
+				OWLEntity selectedEntity = (OWLEntity) lse.getSource();
+				oplaController.retrieveEntityAnnotations(selectedEntity);
+				try
+				{
+					// Get the list of the required entities
+					List<OWLEntity> retrievedAnnotations = oplaController.retrieveEntityAnnotations(selectedEntity);
+					// clear the current list
+					annotationListModel.removeAllElements();
+					// Add all the elements to the list model
+					retrievedAnnotations.forEach(e ->annotationListModel.addElement(e));
+				}
+				catch(ClassCastException e)
+				{
+					log.debug(e.getMessage());
+				}
 			}
 		});
+		this.entityScrollPane = new JScrollPane(this.entityList);
+		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
+		this.annotationScrollPane = new JScrollPane(this.annotationList);
+		this.annotationScrollPane.setPreferredSize(new Dimension(500, 300));
 
 		// Create the dropdown menu
 		comboAnnotations = new JComboBox<String>();
