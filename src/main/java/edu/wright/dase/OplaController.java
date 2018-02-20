@@ -242,12 +242,11 @@ public class OplaController
 		Set<OWLAnnotationProperty> set = this.owlOntology.getAnnotationPropertiesInSignature();
 		return new ArrayList<OWLEntity>(set);
 	}
-	
+
 	public List<OWLEntity> retrieveEntityAnnotations(OWLEntity selectedEntity)
 	{
 		Set<OWLAnnotationProperty> set = selectedEntity.getAnnotationPropertiesInSignature();
 		return new ArrayList<OWLEntity>(set);
 	}
-	
-	
+
 }

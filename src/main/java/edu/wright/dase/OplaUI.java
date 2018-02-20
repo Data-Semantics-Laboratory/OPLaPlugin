@@ -33,8 +33,8 @@ public class OplaUI extends JPanel
 {
 	/** Bookkeeping */
 	private static final long			serialVersionUID	= 1L;
-	private final Logger				log	= LoggerFactory.getLogger(OplaUI.class);
-	
+	private final Logger				log					= LoggerFactory.getLogger(OplaUI.class);
+
 	/** Panels! */
 	private JPanel						entityPanel;
 	private JPanel						editorPanel;
@@ -51,8 +51,6 @@ public class OplaUI extends JPanel
 	private JTextField					targetTextField;
 
 	private ButtonGroup					buttons;
-
-	private JCheckBox					filterCheckBox;
 
 	public OplaUI(OplaController oplaController)
 	{
@@ -122,6 +120,7 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
+						entityList.clearSelection();
 						String selectedEntity = ((JRadioButton) ie.getSource()).getText();
 						updateEntityList(selectedEntity);
 					}
@@ -129,7 +128,7 @@ public class OplaUI extends JPanel
 			});
 		}
 	}
-	
+
 	private void updateEntityList(String selectedEntity)
 	{
 		try
@@ -139,7 +138,7 @@ public class OplaUI extends JPanel
 			// clear the current list
 			entityListModel.removeAllElements();
 			// Add all the elements to the list model
-			retrievedEntities.forEach(e ->entityListModel.addElement(e));
+			retrievedEntities.forEach(e -> entityListModel.addElement(e));
 		}
 		catch(ClassCastException e)
 		{
@@ -154,13 +153,14 @@ public class OplaUI extends JPanel
 		this.entityList.setModel(this.entityListModel);
 		this.annotationList = new JList<>();
 		this.annotationList.setModel(this.annotationListModel);
-		annotationList.addListSelectionListener(new ListSelectionListener() {
+		entityList.addListSelectionListener(new ListSelectionListener()
+		{
 
 			@Override
 			public void valueChanged(ListSelectionEvent lse)
 			{
-				OWLEntity selectedEntity = (OWLEntity) lse.getSource();
-				oplaController.retrieveEntityAnnotations(selectedEntity);
+				int index = lse.getFirstIndex();
+				OWLEntity selectedEntity = entityListModel.getElementAt(index);
 				try
 				{
 					// Get the list of the required entities
@@ -168,7 +168,7 @@ public class OplaUI extends JPanel
 					// clear the current list
 					annotationListModel.removeAllElements();
 					// Add all the elements to the list model
-					retrievedAnnotations.forEach(e ->annotationListModel.addElement(e));
+					retrievedAnnotations.forEach(e -> annotationListModel.addElement(e));
 				}
 				catch(ClassCastException e)
 				{
@@ -221,7 +221,7 @@ public class OplaUI extends JPanel
 
 		// Add everything to the panel
 		this.editorPanel.add(this.entityScrollPane);
-		this.editorPanel.add(filterCheckBox);
+		this.editorPanel.add(this.annotationScrollPane);
 		this.editorPanel.add(comboAnnotations);
 		this.editorPanel.add(targetTextField);
 		this.editorPanel.add(saveButton);
