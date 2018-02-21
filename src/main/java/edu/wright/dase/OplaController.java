@@ -243,10 +243,12 @@ public class OplaController
 		return new ArrayList<OWLEntity>(set);
 	}
 
-	public List<OWLEntity> retrieveEntityAnnotations(OWLEntity selectedEntity)
+	public List<OWLAnnotationAssertionAxiom> retrieveEntityAnnotations(OWLEntity selectedEntity)
 	{
-		Set<OWLAnnotationProperty> set = selectedEntity.getAnnotationPropertiesInSignature();
-		return new ArrayList<OWLEntity>(set);
+		// Get all OWLAnnotationAssertionAxioms from the ontology
+		// that specifically pertain to the selectedEntity
+		Set<OWLAnnotationAssertionAxiom> annotations = this.owlOntology.getAnnotationAssertionAxioms(selectedEntity.getIRI());
+		
+		return new ArrayList<OWLAnnotationAssertionAxiom>(annotations);
 	}
-
 }

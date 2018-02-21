@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,25 +32,25 @@ import org.slf4j.LoggerFactory;
 public class OplaUI extends JPanel
 {
 	/** Bookkeeping */
-	private static final long			serialVersionUID	= 1L;
-	private final Logger				log					= LoggerFactory.getLogger(OplaUI.class);
+	private static final long								serialVersionUID	= 1L;
+	private final Logger									log					= LoggerFactory.getLogger(OplaUI.class);
 
 	/** Panels! */
-	private JPanel						entityPanel;
-	private JPanel						editorPanel;
+	private JPanel											entityPanel;
+	private JPanel											editorPanel;
 	/** The Controller */
-	private OplaController				oplaController;
+	private OplaController									oplaController;
 
-	private DefaultListModel<OWLEntity>	entityListModel;
-	private JList<OWLEntity>			entityList;
-	private DefaultListModel<OWLEntity>	annotationListModel;
-	private JList<OWLEntity>			annotationList;
-	private JScrollPane					entityScrollPane;
-	private JScrollPane					annotationScrollPane;
-	private JComboBox<String>			comboAnnotations;
-	private JTextField					targetTextField;
+	private DefaultListModel<OWLEntity>						entityListModel;
+	private JList<OWLEntity>								entityList;
+	private DefaultListModel<OWLAnnotationAssertionAxiom>	annotationListModel;
+	private JList<OWLAnnotationAssertionAxiom>				annotationList;
+	private JScrollPane										entityScrollPane;
+	private JScrollPane										annotationScrollPane;
+	private JComboBox<String>								comboAnnotations;
+	private JTextField										targetTextField;
 
-	private ButtonGroup					buttons;
+	private ButtonGroup										buttons;
 
 	public OplaUI(OplaController oplaController)
 	{
@@ -143,7 +144,6 @@ public class OplaUI extends JPanel
 		{
 			log.debug(e.getMessage());
 		}
-
 	}
 
 	private void createEditorPanel()
@@ -160,14 +160,15 @@ public class OplaUI extends JPanel
 			{
 				// prevents the functionality from firing twice
 				// see documentation on listselectionevent
-				if(!lse.getValueIsAdjusting()) 
+				if(!lse.getValueIsAdjusting())
 				{
 					try
 					{
 						int index = lse.getFirstIndex();
 						OWLEntity selectedEntity = entityListModel.getElementAt(index);
 						// Get the list of the required entities
-						List<OWLEntity> retrievedAnnotations = oplaController.retrieveEntityAnnotations(selectedEntity);
+						List<OWLAnnotationAssertionAxiom> retrievedAnnotations = oplaController
+						        .retrieveEntityAnnotations(selectedEntity);
 						// clear the current list
 						annotationListModel.removeAllElements();
 						// Add all the elements to the list model
