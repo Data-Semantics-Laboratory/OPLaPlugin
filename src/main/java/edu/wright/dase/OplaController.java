@@ -148,19 +148,6 @@ public class OplaController
 		return retrievedEntities;
 	}
 
-	private boolean containsOplaAnnotation(OWLEntity e)
-	{
-		// Iterate through all the datatype properties
-		for(OWLAnnotationProperty prop : oplaAnnotations.values())
-		{
-			// And return true if there is an oplaannotation for the entity
-			if(e.containsEntityInSignature(prop))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * creates an annotationassertionaxiom to add to the ontology.
