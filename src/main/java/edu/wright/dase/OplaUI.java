@@ -53,7 +53,6 @@ public class OplaUI extends JPanel
 	private ButtonGroup										buttons;
 	private OWLEntity										selectedEntity;
 
-
 	public OplaUI(OplaController oplaController)
 	{
 		// Save a reference to the controller
@@ -66,7 +65,8 @@ public class OplaUI extends JPanel
 		// Populate the panels
 		createEntityPanel();
 		createEditorPanel();
-
+		createAnnotationPanel();
+		
 		// Construct top level panel
 		setLayout(new BorderLayout());
 		this.add(this.entityPanel, BorderLayout.NORTH);
@@ -150,8 +150,6 @@ public class OplaUI extends JPanel
 	{
 		this.entityList = new JList<>();
 		this.entityList.setModel(this.entityListModel);
-		this.annotationList = new JList<>();
-		this.annotationList.setModel(this.annotationListModel);
 
 		this.entityList.addListSelectionListener(new ListSelectionListener()
 		{
@@ -171,8 +169,7 @@ public class OplaUI extends JPanel
 					catch(ArrayIndexOutOfBoundsException e)
 					{
 						// Don't do anything, this prevents the error when
-						// switching
-						// entity views
+						// switching entity views
 					}
 					catch(ClassCastException e)
 					{
@@ -184,8 +181,7 @@ public class OplaUI extends JPanel
 
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
-		this.annotationScrollPane = new JScrollPane(this.annotationList);
-		this.annotationScrollPane.setPreferredSize(new Dimension(500, 300));
+
 
 		// Create the dropdown menu
 		comboAnnotations = new JComboBox<String>();
@@ -221,6 +217,26 @@ public class OplaUI extends JPanel
 			}
 		});
 
+		// Create the "editor" panel
+		this.editorPanel = new JPanel();
+		this.editorPanel.setLayout(new FlowLayout());
+		this.editorPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+		// Add everything to the panel
+		this.editorPanel.add(this.entityScrollPane);
+		this.editorPanel.add(comboAnnotations);
+		this.editorPanel.add(targetTextField);
+		this.editorPanel.add(saveButton);
+	}
+
+	private void createAnnotationPanel()
+	{
+		this.annotationList = new JList<>();
+		this.annotationList.setModel(this.annotationListModel);
+		
+		this.annotationScrollPane = new JScrollPane(this.annotationList);
+		this.annotationScrollPane.setPreferredSize(new Dimension(500, 300));
+		
 		// Create the remove button
 		JButton removeButton = new JButton("Remove");
 		removeButton.addActionListener(new ActionListener()
@@ -231,31 +247,19 @@ public class OplaUI extends JPanel
 				OWLAnnotationAssertionAxiom owlAxiom = annotationList.getSelectedValue();
 				oplaController.removeAnnotation(owlAxiom);
 				updateAnnotationList(selectedEntity);
-
 			}
 		});
-
-		// Create the "editor" panel
-		this.editorPanel = new JPanel();
-		this.editorPanel.setLayout(new FlowLayout());
-		this.editorPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
+		
 		// Create the "annotation" panel
 		this.annotationPanel = new JPanel();
 		this.annotationPanel.setLayout(new FlowLayout());
 		this.annotationPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-		// Add everything to the panel
-		this.editorPanel.add(this.entityScrollPane);
-		this.editorPanel.add(comboAnnotations);
-		this.editorPanel.add(targetTextField);
-		this.editorPanel.add(saveButton);
-
+	
 		// Add everything to the "annotation" panel
 		this.annotationPanel.add(this.annotationScrollPane);
 		this.annotationPanel.add(removeButton);
 	}
-
+	
 	private void updateAnnotationList(OWLEntity selectedEntity)
 	{
 		try
