@@ -79,7 +79,6 @@ public class OplaUI extends JPanel
 		JRadioButton dataProp = new JRadioButton("Data Properties");
 		JRadioButton dataType = new JRadioButton("Data Types");
 		JRadioButton annot = new JRadioButton("Annotations");
-		JRadioButton classAx = new JRadioButton("Class Axioms");
 
 		// Set the default Selection
 		classes.setSelected(true); // TODO fire the update entity list,
@@ -92,7 +91,6 @@ public class OplaUI extends JPanel
 		this.buttons.add(dataProp);
 		this.buttons.add(dataType);
 		this.buttons.add(annot);
-		this.buttons.add(classAx);
 
 		// Create the panel for options
 		this.entityPanel = new JPanel();
@@ -106,7 +104,6 @@ public class OplaUI extends JPanel
 		this.entityPanel.add(dataProp);
 		this.entityPanel.add(dataType);
 		this.entityPanel.add(annot);
-		this.entityPanel.add(classAx);
 
 		// Create the ItemListeners for the buttons
 		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
