@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -237,5 +238,13 @@ public class OplaController
 		Set<OWLAnnotationAssertionAxiom> annotations = this.owlOntology.getAnnotationAssertionAxioms(selectedEntity.getIRI());
 		
 		return new ArrayList<OWLAnnotationAssertionAxiom>(annotations);
+	}
+	
+	public void removeAnnotation(OWLAnnotationAssertionAxiom owlAxiom)
+	{
+		// Create the ontologychange
+		RemoveAxiom removeAxiom = new RemoveAxiom(this.owlOntology, owlAxiom);
+		// Apply it!
+		this.modelManager.applyChange(removeAxiom);
 	}
 }
