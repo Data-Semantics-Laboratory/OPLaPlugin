@@ -31,16 +31,16 @@ import org.slf4j.LoggerFactory;
 
 public class OplaUI extends JPanel
 {
-	/** Bookkeeping */
+	/* Bookkeeping */
 	private static final long								serialVersionUID	= 1L;
 	private final Logger									log					= LoggerFactory.getLogger(OplaUI.class);
 
-	/** Panels! */
+	/* Panels! */
 	private JPanel											entityPanel;
 	private JPanel											editorPanel;
-	/** The Controller */
+	/* The Controller */
 	private OplaController									oplaController;
-
+	/* References to major gui pieces */
 	private DefaultListModel<OWLEntity>						entityListModel;
 	private JList<OWLEntity>								entityList;
 	private DefaultListModel<OWLAnnotationAssertionAxiom>	annotationListModel;
@@ -49,7 +49,6 @@ public class OplaUI extends JPanel
 	private JScrollPane										annotationScrollPane;
 	private JComboBox<String>								comboAnnotations;
 	private JTextField										targetTextField;
-
 	private ButtonGroup										buttons;
 
 	public OplaUI(OplaController oplaController)
