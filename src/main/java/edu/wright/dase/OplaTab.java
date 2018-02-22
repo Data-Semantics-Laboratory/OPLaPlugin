@@ -43,11 +43,12 @@ public class OplaTab extends OWLWorkspaceViewsTab
 			// Construct and populate the layout
 			setLayout(new BorderLayout());
 
+			// Run the update code
 			update();
 		}
 		else // output warning to log, do not initialize further
 		{
-			log.warn("OPLaTab initialization failed: no model manager");
+			log.warn("[OplaTab] Initialization failed: no model manager");
 		}
 	}
 
@@ -98,7 +99,7 @@ public class OplaTab extends OWLWorkspaceViewsTab
 				}
 				catch(Exception e)
 				{
-					log.warn("Exception thrown in update method.");
+					log.warn("[OplaTab] Update failed.");
 					e.printStackTrace();
 				}
 			}
