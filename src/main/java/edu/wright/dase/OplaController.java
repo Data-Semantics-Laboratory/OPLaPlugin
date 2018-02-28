@@ -110,11 +110,16 @@ public class OplaController
 		return oplaAnnotationProperties;
 	}
 
+	/** calls the dedicated retrieval method based on selectedEntity */
 	public List<OWLEntity> retrieve(String selectedEntity)
 	{
 		List<OWLEntity> retrievedEntities;
 
-		if(selectedEntity.equals("Classes"))
+		if(selectedEntity.equals("Ontology"))
+		{
+			retrievedEntities = this.retrieveTopLevel();
+		}
+		else if(selectedEntity.equals("Classes"))
 		{
 			retrievedEntities = this.retrieveClasses();
 		}
@@ -142,10 +147,11 @@ public class OplaController
 		{
 			retrievedEntities = this.retrieveClasses();
 		}
-		else
+		else // something went wrong, send empty list to prevent NPE.
 		{
 			retrievedEntities = new ArrayList<>();
 		}
+		
 		return retrievedEntities;
 	}
 
@@ -195,6 +201,15 @@ public class OplaController
 
 	/* *********************************************** */
 
+	private List<OWLEntity> retrieveTopLevel()
+	{
+		ArrayList<OWLEntity> lst = new ArrayList<>();
+		
+//		lst.add(this.owlOntology);
+		
+		return lst;
+	}
+	
 	private List<OWLEntity> retrieveClasses()
 	{
 		Set<OWLClass> set = this.owlOntology.getClassesInSignature();

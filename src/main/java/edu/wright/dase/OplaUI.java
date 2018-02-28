@@ -34,6 +34,8 @@ public class OplaUI extends JPanel
 	/* Bookkeeping */
 	private static final long								serialVersionUID	= 1L;
 	private final Logger									log					= LoggerFactory.getLogger(OplaUI.class);
+	private static final String[]							buttonLabels		= { "Ontology", "Classes",
+	        "Individuals", "Object Properties", "Data Properties", "Data Types", "Annotations" };
 
 	/* Panels! */
 	private JPanel											entityPanel;
@@ -66,7 +68,7 @@ public class OplaUI extends JPanel
 		createEntityPanel();
 		createEditorPanel();
 		createAnnotationPanel();
-		
+
 		// Construct top level panel
 		setLayout(new BorderLayout());
 		this.add(this.entityPanel, BorderLayout.NORTH);
@@ -76,43 +78,18 @@ public class OplaUI extends JPanel
 
 	private void createEntityPanel()
 	{
-		// Create the buttons
-		JRadioButton classes = new JRadioButton("Classes");
-		JRadioButton individuals = new JRadioButton("Individuals");
-		JRadioButton objProp = new JRadioButton("Object Properties");
-		JRadioButton dataProp = new JRadioButton("Data Properties");
-		JRadioButton dataType = new JRadioButton("Data Types");
-		JRadioButton annot = new JRadioButton("Annotations");
-
-		// Set the default Selection
-		classes.setSelected(true); // TODO fire the update entity list,
-
-		// Add the buttons to a buttongroup
+		// Initialize button group
 		this.buttons = new ButtonGroup();
-		this.buttons.add(classes);
-		this.buttons.add(individuals);
-		this.buttons.add(objProp);
-		this.buttons.add(dataProp);
-		this.buttons.add(dataType);
-		this.buttons.add(annot);
-
-		// Create the panel for options
+		// Create the panel for the Entity Options
 		this.entityPanel = new JPanel();
 		this.entityPanel.setLayout(new FlowLayout());
 		this.entityPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-		// Add the buttons to the panel
-		this.entityPanel.add(classes);
-		this.entityPanel.add(individuals);
-		this.entityPanel.add(objProp);
-		this.entityPanel.add(dataProp);
-		this.entityPanel.add(dataType);
-		this.entityPanel.add(annot);
-
-		// Create the ItemListeners for the buttons
-		for(Enumeration<AbstractButton> e = buttons.getElements(); e.hasMoreElements();)
+		// Create all buttons for the Entity Options
+		for(String label : buttonLabels)
 		{
-			JRadioButton jrb = (JRadioButton) e.nextElement();
+			// Create the button
+			JRadioButton jrb = new JRadioButton(label);
+			// Create an ItemListener for the button
 			jrb.addItemListener(new ItemListener()
 			{
 				@Override
@@ -120,22 +97,34 @@ public class OplaUI extends JPanel
 				{
 					if(ie.getStateChange() == ItemEvent.SELECTED)
 					{
-						entityList.clearSelection();
+						// Add the annotations related to the chosen option
 						String selectedEntity = ((JRadioButton) ie.getSource()).getText();
 						updateEntityList(selectedEntity);
 					}
 				}
 			});
+			// Add the button to the button group
+			this.buttons.add(jrb);
+			// Add the button to the panel
+			this.entityPanel.add(jrb);
 		}
 	}
 
+	/**
+	 * This method updates the entityListModel to display the axioms related to
+	 * the selectedEntity
+	 * 
+	 * @param selectedEntity
+	 *            alias for the entity type.
+	 */
 	private void updateEntityList(String selectedEntity)
 	{
 		try
 		{
 			// Get the list of the required entities
 			List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity);
-			// clear the current list
+			// Clear the current list 
+			// (this also removes everything from the scrollpane)
 			entityListModel.removeAllElements();
 			// Add all the elements to the list model
 			retrievedEntities.forEach(e -> entityListModel.addElement(e));
@@ -181,7 +170,6 @@ public class OplaUI extends JPanel
 
 		this.entityScrollPane = new JScrollPane(this.entityList);
 		this.entityScrollPane.setPreferredSize(new Dimension(500, 300));
-
 
 		// Create the dropdown menu
 		comboAnnotations = new JComboBox<String>();
@@ -233,10 +221,10 @@ public class OplaUI extends JPanel
 	{
 		this.annotationList = new JList<>();
 		this.annotationList.setModel(this.annotationListModel);
-		
+
 		this.annotationScrollPane = new JScrollPane(this.annotationList);
 		this.annotationScrollPane.setPreferredSize(new Dimension(500, 300));
-		
+
 		// Create the remove button
 		JButton removeButton = new JButton("Remove");
 		removeButton.addActionListener(new ActionListener()
@@ -249,17 +237,17 @@ public class OplaUI extends JPanel
 				updateAnnotationList(selectedEntity);
 			}
 		});
-		
+
 		// Create the "annotation" panel
 		this.annotationPanel = new JPanel();
 		this.annotationPanel.setLayout(new FlowLayout());
 		this.annotationPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-	
+
 		// Add everything to the "annotation" panel
 		this.annotationPanel.add(this.annotationScrollPane);
 		this.annotationPanel.add(removeButton);
 	}
-	
+
 	private void updateAnnotationList(OWLEntity selectedEntity)
 	{
 		try
