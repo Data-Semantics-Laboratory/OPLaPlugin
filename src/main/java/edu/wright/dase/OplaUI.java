@@ -8,10 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -24,36 +23,37 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OplaUI extends JPanel
 {
 	/* Bookkeeping */
-	private static final long								serialVersionUID	= 1L;
-	private final Logger									log					= LoggerFactory.getLogger(OplaUI.class);
-	private static final String[]							buttonLabels		= { "Ontology", "Classes",
-	        "Individuals", "Object Properties", "Data Properties", "Data Types", "Annotations" };
+	private static final long				serialVersionUID	= 1L;
+	private final Logger					log					= LoggerFactory.getLogger(OplaUI.class);
+	private static final String[]			buttonLabels		= { "Ontology", "Classes", "Individuals",
+	        "Object Properties", "Data Properties", "Data Types", "Annotations" };
 
 	/* Panels! */
-	private JPanel											entityPanel;
-	private JPanel											editorPanel;
-	private JPanel											annotationPanel;
+	private JPanel							entityPanel;
+	private JPanel							editorPanel;
+	private JPanel							annotationPanel;
 	/* The Controller */
-	private OplaController									oplaController;
+	private OplaController					oplaController;
 	/* References to major gui pieces */
-	private DefaultListModel<OWLEntity>						entityListModel;
-	private JList<OWLEntity>								entityList;
-	private DefaultListModel<OWLAnnotationAssertionAxiom>	annotationListModel;
-	private JList<OWLAnnotationAssertionAxiom>				annotationList;
-	private JScrollPane										entityScrollPane;
-	private JScrollPane										annotationScrollPane;
-	private JComboBox<String>								comboAnnotations;
-	private JTextField										targetTextField;
-	private ButtonGroup										buttons;
-	private OWLEntity										selectedEntity;
+	private DefaultListModel<OWLObject>		entityListModel;
+	private JList<OWLObject>				entityList;
+	private DefaultListModel<OWLAnnotation>	annotationListModel;
+	private JList<OWLAnnotation>			annotationList;
+	private JScrollPane						entityScrollPane;
+	private JScrollPane						annotationScrollPane;
+	private JComboBox<String>				comboAnnotations;
+	private JTextField						targetTextField;
+	private ButtonGroup						buttons;
+	private OWLObject						selectedObject;
 
 	public OplaUI(OplaController oplaController)
 	{
@@ -99,7 +99,15 @@ public class OplaUI extends JPanel
 					{
 						// Add the annotations related to the chosen option
 						String selectedEntity = ((JRadioButton) ie.getSource()).getText();
-						updateEntityList(selectedEntity);
+
+						if(selectedEntity.equals("Ontology"))
+						{
+							ontologyAsSelectedEntity();
+						}
+						else
+						{
+							updateEntityList(selectedEntity);
+						}
 					}
 				}
 			});
@@ -110,20 +118,13 @@ public class OplaUI extends JPanel
 		}
 	}
 
-	/**
-	 * This method updates the entityListModel to display the axioms related to
-	 * the selectedEntity
-	 * 
-	 * @param selectedEntity
-	 *            alias for the entity type.
-	 */
 	private void updateEntityList(String selectedEntity)
 	{
 		try
 		{
 			// Get the list of the required entities
 			List<OWLEntity> retrievedEntities = oplaController.retrieve(selectedEntity);
-			// Clear the current list 
+			// Clear the current list
 			// (this also removes everything from the scrollpane)
 			entityListModel.removeAllElements();
 			// Add all the elements to the list model
@@ -135,11 +136,23 @@ public class OplaUI extends JPanel
 		}
 	}
 
+	private void ontologyAsSelectedEntity()
+	{
+		// Clear the current list
+		// (this also removes everything from the scrollpane)
+		entityListModel.removeAllElements();
+		// Add the ontology as a top level "entity"
+		// TODO figure out how to display this as an iri or in shortform
+		entityListModel.addElement(this.oplaController.getOwlOntology());
+	}
+
 	private void createEditorPanel()
 	{
+		// Initialize the entity list
 		this.entityList = new JList<>();
 		this.entityList.setModel(this.entityListModel);
-
+		// Create a listener that updates the annotation list based on which
+		// entity has been selected in the list
 		this.entityList.addListSelectionListener(new ListSelectionListener()
 		{
 			@Override
@@ -152,17 +165,13 @@ public class OplaUI extends JPanel
 					try
 					{
 						int index = lse.getFirstIndex();
-						selectedEntity = entityListModel.getElementAt(index);
-						updateAnnotationList(selectedEntity);
+						selectedObject = entityListModel.getElementAt(index);
+						updateAnnotationList();
 					}
 					catch(ArrayIndexOutOfBoundsException e)
 					{
 						// Don't do anything, this prevents the error when
 						// switching entity views
-					}
-					catch(ClassCastException e)
-					{
-						log.debug(e.getMessage());
 					}
 				}
 			}
@@ -191,17 +200,20 @@ public class OplaUI extends JPanel
 
 		// Create the button for saving the annotation
 		JButton saveButton = new JButton("Save");
-
+		// Define this behavior
 		saveButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				OWLEntity owlEntity = entityList.getSelectedValue();
+				// Gather the necessary information
+				OWLObject obj = entityList.getSelectedValue();
 				String comboString = comboAnnotations.getSelectedItem().toString();
 				String textFieldString = targetTextField.getText();
-				oplaController.addAnnotation(owlEntity, comboString, textFieldString);
-				updateAnnotationList(selectedEntity);
+				// Add the annotation to the ontology or entity
+				oplaController.addAnnotation(obj, comboString, textFieldString);
+				// Update the annotation panel
+				updateAnnotationList(); 
 			}
 		});
 
@@ -232,9 +244,9 @@ public class OplaUI extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				OWLAnnotationAssertionAxiom owlAxiom = annotationList.getSelectedValue();
-				oplaController.removeAnnotation(owlAxiom);
-				updateAnnotationList(selectedEntity);
+				OWLAnnotation owlAnnotation = annotationList.getSelectedValue();
+				oplaController.removeAnnotation(selectedObject, owlAnnotation);
+				updateAnnotationList();
 			}
 		});
 
@@ -248,21 +260,15 @@ public class OplaUI extends JPanel
 		this.annotationPanel.add(removeButton);
 	}
 
-	private void updateAnnotationList(OWLEntity selectedEntity)
+	private void updateAnnotationList()
 	{
-		try
-		{
-			// Get the list of the required entities
-			List<OWLAnnotationAssertionAxiom> retrievedAnnotations = oplaController
-			        .retrieveEntityAnnotations(selectedEntity);
-			// clear the current list
-			annotationListModel.removeAllElements();
-			// Add all the elements to the list model
-			retrievedAnnotations.forEach(e -> annotationListModel.addElement(e));
-		}
-		catch(ClassCastException e)
-		{
-			log.debug(e.getMessage());
-		}
+		List<OWLAnnotation> retrievedAnnotations = new ArrayList<>();
+		// Get the list of the relevant annotations
+		retrievedAnnotations = oplaController.retrieveAnnotations(selectedObject);
+		// Clear the current list
+		// (this also removes everything from the scrollpane)
+		annotationListModel.removeAllElements();
+		// Add all the elements to the list model
+		retrievedAnnotations.forEach(e -> annotationListModel.addElement(e));
 	}
 }

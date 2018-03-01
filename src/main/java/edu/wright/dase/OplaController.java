@@ -9,6 +9,7 @@ import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.find.OWLEntityFinder;
 import org.semanticweb.owlapi.formats.PrefixDocumentFormat;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -20,9 +21,11 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.RemoveAxiom;
+import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +33,6 @@ public class OplaController
 {
 	/** book keeping (literally) */
 	private final Logger							log		= LoggerFactory.getLogger(OplaController.class);
-
 	private final static String						prefix	= "opla";
 
 	private HashMap<String, OWLAnnotationProperty>	oplaAnnotations;
@@ -115,11 +117,7 @@ public class OplaController
 	{
 		List<OWLEntity> retrievedEntities;
 
-		if(selectedEntity.equals("Ontology"))
-		{
-			retrievedEntities = this.retrieveTopLevel();
-		}
-		else if(selectedEntity.equals("Classes"))
+		if(selectedEntity.equals("Classes"))
 		{
 			retrievedEntities = this.retrieveClasses();
 		}
@@ -151,10 +149,9 @@ public class OplaController
 		{
 			retrievedEntities = new ArrayList<>();
 		}
-		
+
 		return retrievedEntities;
 	}
-
 
 	/**
 	 * creates an annotationassertionaxiom to add to the ontology.
@@ -187,8 +184,36 @@ public class OplaController
 		return annotationAssertionAxiom;
 	}
 
-	/** add the AnnotationAssertionAxiom to the ontology. */
-	public void addAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
+	/** creates an annotation to attach to the ontology */
+	public OWLAnnotation makeOntologyAnnotation(String comboString, String textFieldString)
+	{
+		// Retrieve the annotation property from the annotation list.
+		OWLAnnotationProperty owlAnnotationProperty = this.oplaAnnotations.get(comboString);
+		// Use the entityFinder to get the Literal Datatype
+		OWLDatatype owlDataType = this.owlEntityFinder.getOWLDatatype("rdfs:Literal");
+		// Construct a literal using the textfieldString
+		OWLLiteral owlLiteral = owlDataFactory.getOWLLiteral(textFieldString, owlDataType);
+		// Create the annotation
+		OWLAnnotation owlAnnotation = owlDataFactory.getOWLAnnotation(owlAnnotationProperty, owlLiteral);
+		// Return it
+		return owlAnnotation;
+	}
+
+	/** switch method for adding annotations to ontology or entity */
+	public void addAnnotation(OWLObject selectedObject, String comboString, String textFieldString)
+	{
+		if(selectedObject instanceof OWLOntology)
+		{
+			addOntologyAnnotation(comboString, textFieldString);
+		}
+		else
+		{
+			addAnnotation((OWLEntity) selectedObject, comboString, textFieldString);
+		}
+	}
+
+	/** add an AnnotationAssertionAxiom to the ontology. */
+	public void addEntityAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
 	{
 		// construct the annotation axiom from the items sent from the gui
 		OWLAnnotationAssertionAxiom annotationAssertionAxiom = makeAnnotationAxiom(owlEntity, comboString,
@@ -199,17 +224,18 @@ public class OplaController
 		this.modelManager.applyChange(addAxiom);
 	}
 
-	/* *********************************************** */
-
-	private List<OWLEntity> retrieveTopLevel()
+	/** add an Annotation to the Ontology */
+	public void addOntologyAnnotation(String comboString, String textFieldString)
 	{
-		ArrayList<OWLEntity> lst = new ArrayList<>();
-		
-//		lst.add(this.owlOntology);
-		
-		return lst;
+		// Construct the annotation
+		OWLAnnotation annotation = makeOntologyAnnotation(comboString, textFieldString);
+		// Create the AnnotationChange
+		AddOntologyAnnotation addOntologyAnnotation = new AddOntologyAnnotation(this.owlOntology, annotation);
+		// Apply it!
+		this.modelManager.applyChange(addOntologyAnnotation);
 	}
-	
+
+	/* *********************************************** */
 	private List<OWLEntity> retrieveClasses()
 	{
 		Set<OWLClass> set = this.owlOntology.getClassesInSignature();
@@ -245,21 +271,95 @@ public class OplaController
 		Set<OWLAnnotationProperty> set = this.owlOntology.getAnnotationPropertiesInSignature();
 		return new ArrayList<OWLEntity>(set);
 	}
+	/* *********************************************** */
+	
+	/** Switch method for retrieving annotations for an ontology or entity */
+	public List<OWLAnnotation> retrieveAnnotations(OWLObject selectedObject)
+	{
+		List<OWLAnnotation> retrievedAnnotations = new ArrayList<>();
 
-	public List<OWLAnnotationAssertionAxiom> retrieveEntityAnnotations(OWLEntity selectedEntity)
+		if(selectedObject instanceof OWLOntology)
+		{
+			retrievedAnnotations = retrieveOntologyAnnotations();
+		}
+		else
+		{
+			retrievedAnnotations = retrieveEntityAnnotations((OWLEntity) selectedObject);
+		}
+
+		return retrievedAnnotations;
+	}
+
+	/** retrieves the annotations associated with the ontology*/
+	public List<OWLAnnotation> retrieveOntologyAnnotations()
+	{
+		return new ArrayList<OWLAnnotation>(this.owlOntology.getAnnotations());
+	}
+
+	/** retrieves the annotations associated with the selectedEntity */
+	public List<OWLAnnotation> retrieveEntityAnnotations(OWLEntity selectedEntity)
 	{
 		// Get all OWLAnnotationAssertionAxioms from the ontology
 		// that specifically pertain to the selectedEntity
-		Set<OWLAnnotationAssertionAxiom> annotations = this.owlOntology.getAnnotationAssertionAxioms(selectedEntity.getIRI());
-		
-		return new ArrayList<OWLAnnotationAssertionAxiom>(annotations);
+		Set<OWLAnnotationAssertionAxiom> annotationAxioms = this.owlOntology
+		        .getAnnotationAssertionAxioms(selectedEntity.getIRI());
+		// We are interested in the actual annotations, we can assume the
+		// subject
+		// Because it is the selectedEntity
+		List<OWLAnnotation> annotations = new ArrayList<>();
+		annotationAxioms.forEach(axiom -> {
+			OWLAnnotation annotation = axiom.getAnnotation();
+			annotations.add(annotation);
+		});
+
+		return annotations;
 	}
-	
-	public void removeAnnotation(OWLAnnotationAssertionAxiom owlAxiom)
+
+	/** switch method for removing an annotation from an entity or ontology */
+	public void removeAnnotation(OWLObject selectedObject, OWLAnnotation annotation)
 	{
-		// Create the ontologychange
+		if(selectedObject instanceof OWLOntology)
+		{
+			removeOntologyAnnotation(annotation);
+		}
+		else
+		{
+			removeEntityAnnotation((OWLEntity) selectedObject, annotation);
+		}
+	}
+
+	/** removes the provided annotation from the ontology */
+	public void removeOntologyAnnotation(OWLAnnotation annotation)
+	{
+		// Create the OntologyChange
+		RemoveOntologyAnnotation removeOntologyAnnotation = new RemoveOntologyAnnotation(this.owlOntology, annotation);
+		// Apply it!
+		this.modelManager.applyChange(removeOntologyAnnotation);
+	}
+
+	/** removes the provided annotation from the selectedEntity */
+	public void removeEntityAnnotation(OWLEntity selectedEntity, OWLAnnotation annotation)
+	{
+		// Find exactly the property to remove
+		Set<OWLAnnotationAssertionAxiom> axioms = this.owlOntology
+		        .getAnnotationAssertionAxioms(selectedEntity.getIRI());
+		OWLAnnotationAssertionAxiom owlAxiom = null;
+		for(OWLAnnotationAssertionAxiom axiom : axioms)
+		{
+			if(axiom.getAnnotation().equals(annotation))
+			{
+				owlAxiom = axiom;
+			}
+		}
+		// Create the OntologyChange
 		RemoveAxiom removeAxiom = new RemoveAxiom(this.owlOntology, owlAxiom);
 		// Apply it!
 		this.modelManager.applyChange(removeAxiom);
+	}
+
+	/* *********************************************** */
+	public OWLOntology getOwlOntology()
+	{
+		return this.owlOntology;
 	}
 }
