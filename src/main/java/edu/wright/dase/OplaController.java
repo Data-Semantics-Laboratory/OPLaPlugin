@@ -208,7 +208,7 @@ public class OplaController
 		}
 		else
 		{
-			addAnnotation((OWLEntity) selectedObject, comboString, textFieldString);
+			addEntityAnnotation((OWLEntity) selectedObject, comboString, textFieldString);
 		}
 	}
 
@@ -318,7 +318,7 @@ public class OplaController
 	/** switch method for removing an annotation from an entity or ontology */
 	public void removeAnnotation(OWLObject selectedObject, OWLAnnotation annotation)
 	{
-		if(selectedObject instanceof OWLOntology)
+		if(selectedObject instanceof IRI)
 		{
 			removeOntologyAnnotation(annotation);
 		}
