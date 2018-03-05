@@ -143,7 +143,7 @@ public class OplaUI extends JPanel
 		entityListModel.removeAllElements();
 		// Add the ontology as a top level "entity"
 		// TODO figure out how to display this as an iri or in shortform
-		entityListModel.addElement(this.oplaController.getOwlOntology());
+		entityListModel.addElement(this.oplaController.getOwlOntology().getOntologyID().getOntologyIRI().get());
 	}
 
 	private void createEditorPanel()

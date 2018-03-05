@@ -202,7 +202,7 @@ public class OplaController
 	/** switch method for adding annotations to ontology or entity */
 	public void addAnnotation(OWLObject selectedObject, String comboString, String textFieldString)
 	{
-		if(selectedObject instanceof OWLOntology)
+		if(selectedObject instanceof IRI)
 		{
 			addOntologyAnnotation(comboString, textFieldString);
 		}
@@ -278,7 +278,7 @@ public class OplaController
 	{
 		List<OWLAnnotation> retrievedAnnotations = new ArrayList<>();
 
-		if(selectedObject instanceof OWLOntology)
+		if(selectedObject instanceof IRI)
 		{
 			retrievedAnnotations = retrieveOntologyAnnotations();
 		}
