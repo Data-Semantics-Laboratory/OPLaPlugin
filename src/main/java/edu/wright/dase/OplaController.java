@@ -33,7 +33,7 @@ public class OplaController
 {
 	/** book keeping (literally) */
 	private final Logger							log		= LoggerFactory.getLogger(OplaController.class);
-	private final static String						prefix	= "opla";
+	private final static String						prefix	= "opla"; // namespace prefix
 
 	private HashMap<String, OWLAnnotationProperty>	oplaAnnotations;
 
