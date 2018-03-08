@@ -286,8 +286,19 @@ public class OplaController
 		{
 			retrievedAnnotations = retrieveEntityAnnotations((OWLEntity) selectedObject);
 		}
+		
+		//Creates a new ArrayList and iterates through the values of oplaAnnotations
+		//and iteratively adds annotations from the retrievedAnnotations to filteredAnnotations iff
+		//oplaAnnotations contains the annotation
+		List<OWLAnnotation> filteredAnnotations = new ArrayList<>();
+		retrievedAnnotations.forEach(annotation -> {
+			if(oplaAnnotations.containsValue(annotation.getProperty()))
+			{
+				filteredAnnotations.add(annotation);
+			}
+		});
 
-		return retrievedAnnotations;
+		return filteredAnnotations;
 	}
 
 	/** retrieves the annotations associated with the ontology*/
@@ -308,8 +319,8 @@ public class OplaController
 		// Because it is the selectedEntity
 		List<OWLAnnotation> annotations = new ArrayList<>();
 		annotationAxioms.forEach(axiom -> {
-			OWLAnnotation annotation = axiom.getAnnotation();
-			annotations.add(annotation);
+				OWLAnnotation annotation = axiom.getAnnotation();
+				annotations.add(annotation);
 		});
 
 		return annotations;
