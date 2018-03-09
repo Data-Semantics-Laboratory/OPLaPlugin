@@ -164,7 +164,7 @@ public class OplaController
 	 * @param textFieldString
 	 *            of the annotation assertion
 	 */
-	public OWLAnnotationAssertionAxiom makeAnnotationAxiom(OWLEntity owlEntity, String comboString,
+	private OWLAnnotationAssertionAxiom makeAnnotationAxiom(OWLEntity owlEntity, String comboString,
 	        String textFieldString)
 	{
 		// Retrieve the annotation property from the annotation list.
@@ -185,7 +185,7 @@ public class OplaController
 	}
 
 	/** creates an annotation to attach to the ontology */
-	public OWLAnnotation makeOntologyAnnotation(String comboString, String textFieldString)
+	private OWLAnnotation makeOntologyAnnotation(String comboString, String textFieldString)
 	{
 		// Retrieve the annotation property from the annotation list.
 		OWLAnnotationProperty owlAnnotationProperty = this.oplaAnnotations.get(comboString);
@@ -213,7 +213,7 @@ public class OplaController
 	}
 
 	/** add an AnnotationAssertionAxiom to the ontology. */
-	public void addEntityAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
+	private void addEntityAnnotation(OWLEntity owlEntity, String comboString, String textFieldString)
 	{
 		// construct the annotation axiom from the items sent from the gui
 		OWLAnnotationAssertionAxiom annotationAssertionAxiom = makeAnnotationAxiom(owlEntity, comboString,
@@ -225,7 +225,7 @@ public class OplaController
 	}
 
 	/** add an Annotation to the Ontology */
-	public void addOntologyAnnotation(String comboString, String textFieldString)
+	private void addOntologyAnnotation(String comboString, String textFieldString)
 	{
 		// Construct the annotation
 		OWLAnnotation annotation = makeOntologyAnnotation(comboString, textFieldString);
@@ -287,9 +287,9 @@ public class OplaController
 			retrievedAnnotations = retrieveEntityAnnotations((OWLEntity) selectedObject);
 		}
 		
-		//Creates a new ArrayList and iterates through the values of oplaAnnotations
-		//and iteratively adds annotations from the retrievedAnnotations to filteredAnnotations iff
-		//oplaAnnotations contains the annotation
+		// Creates a new ArrayList and iterates through the values of oplaAnnotations
+		// and iteratively adds annotations from the retrievedAnnotations to filteredAnnotations iff
+		// oplaAnnotations contains the annotation
 		List<OWLAnnotation> filteredAnnotations = new ArrayList<>();
 		retrievedAnnotations.forEach(annotation -> {
 			if(oplaAnnotations.containsValue(annotation.getProperty()))
@@ -302,13 +302,13 @@ public class OplaController
 	}
 
 	/** retrieves the annotations associated with the ontology*/
-	public List<OWLAnnotation> retrieveOntologyAnnotations()
+	private List<OWLAnnotation> retrieveOntologyAnnotations()
 	{
 		return new ArrayList<OWLAnnotation>(this.owlOntology.getAnnotations());
 	}
 
 	/** retrieves the annotations associated with the selectedEntity */
-	public List<OWLAnnotation> retrieveEntityAnnotations(OWLEntity selectedEntity)
+	private List<OWLAnnotation> retrieveEntityAnnotations(OWLEntity selectedEntity)
 	{
 		// Get all OWLAnnotationAssertionAxioms from the ontology
 		// that specifically pertain to the selectedEntity
@@ -340,7 +340,7 @@ public class OplaController
 	}
 
 	/** removes the provided annotation from the ontology */
-	public void removeOntologyAnnotation(OWLAnnotation annotation)
+	private void removeOntologyAnnotation(OWLAnnotation annotation)
 	{
 		// Create the OntologyChange
 		RemoveOntologyAnnotation removeOntologyAnnotation = new RemoveOntologyAnnotation(this.owlOntology, annotation);
@@ -349,7 +349,7 @@ public class OplaController
 	}
 
 	/** removes the provided annotation from the selectedEntity */
-	public void removeEntityAnnotation(OWLEntity selectedEntity, OWLAnnotation annotation)
+	private void removeEntityAnnotation(OWLEntity selectedEntity, OWLAnnotation annotation)
 	{
 		// Find exactly the property to remove
 		Set<OWLAnnotationAssertionAxiom> axioms = this.owlOntology

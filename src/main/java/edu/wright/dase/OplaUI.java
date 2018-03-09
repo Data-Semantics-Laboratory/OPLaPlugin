@@ -33,7 +33,7 @@ public class OplaUI extends JPanel
 {
 	/* Bookkeeping */
 	private static final long				serialVersionUID	= 1L;
-	private final Logger					log					= LoggerFactory.getLogger(OplaUI.class);
+	private static final Logger					log					= LoggerFactory.getLogger(OplaUI.class);
 	private static final String[]			buttonLabels		= { "Ontology", "Classes", "Individuals",
 	        "Object Properties", "Data Properties", "Data Types", "Annotations" };
 	/* Panels! */
@@ -70,6 +70,8 @@ public class OplaUI extends JPanel
 		this.add(this.entityPanel, BorderLayout.NORTH);
 		this.add(this.editorPanel, BorderLayout.CENTER);
 		this.add(this.annotationPanel, BorderLayout.SOUTH);
+		// Notify
+		log.info("[OplaUI] Successfully created panel.");
 	}
 
 	private void createEntityPanel()
@@ -103,6 +105,7 @@ public class OplaUI extends JPanel
 						else
 						{
 							updateEntityList(selectedEntity);
+							updateCombobox(false);
 						}
 					}
 				}
@@ -127,12 +130,13 @@ public class OplaUI extends JPanel
 
 	private void ontologyAsSelectedEntity()
 	{
-		// Clear the current list
+		// Clear the current entity list
 		// (this also removes everything from the scrollpane)
 		entityListModel.removeAllElements();
 		// Add the ontology as a top level "entity"
-		// TODO figure out how to display this as an iri or in shortform
 		entityListModel.addElement(this.oplaController.getOwlOntology().getOntologyID().getOntologyIRI().get());
+		// Update the combobox accordingly
+		updateCombobox(true);
 	}
 
 	private void createEditorPanel()
@@ -171,17 +175,7 @@ public class OplaUI extends JPanel
 
 		// Create the dropdown menu
 		comboAnnotations = new JComboBox<String>();
-		comboAnnotations.addItem("isNativeTo");
-		comboAnnotations.addItem("ofExternalType");
-		comboAnnotations.addItem("reusesPatternAsTemplate");
-		comboAnnotations.addItem("specializationOfModule");
-		comboAnnotations.addItem("generatlizationOfModule");
-		comboAnnotations.addItem("derivedFromModule");
-		comboAnnotations.addItem("hasRelatedModule");
-		comboAnnotations.addItem("specializationOfPattern");
-		comboAnnotations.addItem("generatlizationOfPattern");
-		comboAnnotations.addItem("derivedFromPattern");
-		comboAnnotations.addItem("hasRelatedPattern");
+		updateCombobox(false);
 
 		// Create targetTextField
 		targetTextField = new JTextField();
@@ -216,6 +210,34 @@ public class OplaUI extends JPanel
 		this.editorPanel.add(comboAnnotations);
 		this.editorPanel.add(targetTextField);
 		this.editorPanel.add(saveButton);
+	}
+
+	/**
+	 * updates the combobox so that it displays only the annotations needed for
+	 * the selected owlobject
+	 */
+	private void updateCombobox(boolean isOntology)
+	{
+		// Clear the combobox
+		this.comboAnnotations.removeAllItems();
+		// Add choices according to whichever owlobject is selected
+		if(isOntology)
+		{
+			comboAnnotations.addItem("reusesPatternAsTemplate");
+			comboAnnotations.addItem("specializationOfModule");
+			comboAnnotations.addItem("generatlizationOfModule");
+			comboAnnotations.addItem("derivedFromModule");
+			comboAnnotations.addItem("hasRelatedModule");
+			comboAnnotations.addItem("specializationOfPattern");
+			comboAnnotations.addItem("generatlizationOfPattern");
+			comboAnnotations.addItem("derivedFromPattern");
+			comboAnnotations.addItem("hasRelatedPattern");
+		}
+		else
+		{
+			comboAnnotations.addItem("isNativeTo");
+			comboAnnotations.addItem("ofExternalType");
+		}
 	}
 
 	private void createAnnotationPanel()
